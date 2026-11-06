@@ -1,5 +1,5 @@
-// Shared content for both versions of the site.
-// Paths are relative to /assets/img/. "-s" suffix = small thumbnail.
+// All site content lives here. Image names map to assets/img/<name>.webp (+ "-s" thumbnail).
+// Videos map to assets/video/<name>.mp4.
 window.PORTFOLIO = {
   name: "batuarchv",
   role: "Cover artist & visual designer",
@@ -9,13 +9,13 @@ window.PORTFOLIO = {
   workEmail: "batu@crashoutent.com",
   links: [
     { label: "Instagram", url: "https://www.instagram.com/batuarchv/" },
-    { label: "Genius", url: "https://genius.com/artists/batuarchv" },
-    { label: "Archive (X)", url: "https://x.com/batuarchvold" },
+    { label: "Genius credits", url: "https://genius.com/artists/batuarchv" },
+    { label: "Old archive (X)", url: "https://x.com/batuarchvold" },
     { label: "Wii Cursors", url: "https://batuarchv.gumroad.com/l/customwiicursors" },
   ],
   clients: ["sulga", "VONN", "kerem.", "ocean", "BEBO", "Godelieve", "Shawnigan", "Se7en of 34", "tunedbugra", "kagan", "Kidkubi", "atabeau"],
 
-  // Featured project
+  /* ---------- page 1 ---------- */
   featured: {
     title: "80B",
     artist: "sulga & tunedbugra",
@@ -25,47 +25,28 @@ window.PORTFOLIO = {
       "Complete visual identity for the 80B album: cover, logotype, the pink 80B mark, repeat pattern, framed print, sticker sheets, phone wallpapers, single covers (DUR, YALNIZ) and promo photography. Plus the music video for YALNIZ.",
     video: { id: "BQtHUmRcaS8", title: "sulga & ocean — YALNIZ (Music Video)" },
     images: [
-      { src: "80b-cover", alt: "80B album cover" },
-      { src: "80b-logo", alt: "80B logotype in pink on black" },
-      { src: "yalniz", alt: "YALNIZ single cover" },
-      { src: "dur", alt: "DUR single cover" },
+      { src: "80b-cover", alt: "80B — album cover" },
+      { src: "80b-logo", alt: "80B logotype" },
+      { src: "yalniz", alt: "YALNIZ — single cover" },
+      { src: "dur", alt: "DUR — single cover" },
       { src: "80b-pattern", alt: "80B repeat pattern" },
-      { src: "80b-print", alt: "Framed 80B print" },
-      { src: "80b-stickers", alt: "80B QR sticker sheets" },
-      { src: "80b-wallpaper", alt: "80B phone wallpaper" },
-      { src: "80b-ashtray", alt: "80B ceramic ashtray" },
-      { src: "80b-promo-1", alt: "80B promo photo" },
-      { src: "80b-promo-2", alt: "80B promo photo" },
-      { src: "80b-promo-3", alt: "80B promo photo" },
+      { src: "80b-print", alt: "Framed print" },
+      { src: "80b-stickers", alt: "QR sticker sheets" },
+      { src: "80b-wallpaper", alt: "Phone wallpaper" },
+      { src: "80b-ashtray", alt: "80B ashtray" },
+      { src: "80b-promo-1", alt: "Promo photo" },
+      { src: "80b-promo-2", alt: "Promo photo" },
+      { src: "80b-promo-3", alt: "Promo photo" },
     ],
   },
 
-  // Highest-engagement work
   highlights: [
-    {
-      title: "Tape Canavarı 3000",
-      artist: "Se7en of 34",
-      year: "2026",
-      note: "Release campaign — most-liked post (900+)",
-      url: "https://www.instagram.com/p/DcjeJHTDC_3/",
-      images: ["tape-1", "tape-2", "tape-3", "tape-4"],
-    },
-    {
-      title: "Crash//Out",
-      artist: "Se7en of 34 / Tabak Trafik",
-      year: "2026",
-      note: "Release visuals & motion",
-      url: "https://www.instagram.com/reel/DfaJxRJsdcm/",
-      images: ["crashout"],
-    },
-    {
-      title: "Custom Wii Cursors",
-      artist: "Personal",
-      year: "2026",
-      note: "20+ HiDPI cursors for macOS & Windows",
-      url: "https://batuarchv.gumroad.com/l/customwiicursors",
-      images: ["wii-1", "wii-2", "wii-3"],
-    },
+    { title: "Tape Canavarı 3000", artist: "Se7en of 34", year: "2026", note: "Release campaign — my most-liked post (900+)",
+      url: "https://www.instagram.com/p/DcjeJHTDC_3/", images: ["tape-1", "tape-2", "tape-3", "tape-4"] },
+    { title: "Crash//Out", artist: "Se7en of 34 / Tabak Trafik", year: "2026", note: "Release visuals & motion",
+      url: "https://www.instagram.com/reel/DfaJxRJsdcm/", images: ["crashout"] },
+    { title: "Custom Wii Cursors", artist: "Personal", year: "2026", note: "20+ HiDPI cursors for macOS & Windows",
+      url: "https://batuarchv.gumroad.com/l/customwiicursors", images: ["wii-1", "wii-2", "wii-3"] },
   ],
 
   covers: [
@@ -92,15 +73,13 @@ window.PORTFOLIO = {
     { src: "bilsen", title: "BİLSEN", artist: "kagan & JR", year: "2025" },
     { src: "harikalar-diyari", title: "Harikalar Diyarı", artist: "VONN", year: "2024" },
     { src: "duman-al", title: "Duman Al", artist: "7even & VONN", year: "2024" },
-    { src: "kagan", title: "Single cover", artist: "kagan", year: "2024" },
     { src: "se7en-of-34", title: "Se7en of 34", artist: "Se7en of 34", year: "2025" },
-    { src: "atabeau-1", title: "selected liminal space works", artist: "atabeau", year: "2024" },
   ],
 
   other: [
-    { src: "atabeau-cd-1", title: "CD art — atabeau", year: "2024" },
-    { src: "atabeau-cd-2", title: "CD art — atabeau", year: "2024" },
     { src: "sagoba-merch", title: "SAGOBA merch", year: "2025" },
+    { src: "acab", title: "All Cats Are Beautiful", year: "2025" },
+    { src: "cats-badge", title: "Cats against fascism", year: "2025" },
     { src: "poster-1", title: "Poster study", year: "2025" },
     { src: "poster-2", title: "Poster study", year: "2025" },
     { src: "poster-3", title: "Poster study", year: "2025" },
@@ -109,17 +88,18 @@ window.PORTFOLIO = {
     { src: "rw3-night", title: "Event visual", year: "2025" },
     { src: "soulbarcode", title: "soulbarcode", year: "2025" },
     { src: "westwood", title: "Logo study", year: "2025" },
-    { src: "acab", title: "All Cats Are Beautiful", year: "2025" },
-    { src: "cats-badge", title: "Cats against fascism", year: "2025" },
     { src: "swag", title: "Collage", year: "2024" },
     { src: "cd-art", title: "Disc art", year: "2024" },
     { src: "collage-room", title: "Collage", year: "2024" },
     { src: "green-figure", title: "Illustration", year: "2025" },
     { src: "stars", title: "Illustration", year: "2025" },
     { src: "supra", title: "Supra", year: "2025" },
-    { src: "poke-1", title: "Favorite Pokémon", year: "2026" },
-    { src: "poke-2", title: "Favorite Pokémon", year: "2026" },
-    { src: "poke-3", title: "Favorite Pokémon", year: "2026" },
-    { src: "poke-4", title: "Favorite Pokémon", year: "2026" },
+    { src: "poke-1", title: "Fan art", year: "2026" },
+    { src: "poke-2", title: "Fan art", year: "2026" },
+    { src: "poke-3", title: "Fan art", year: "2026" },
+    { src: "poke-4", title: "Fan art", year: "2026" },
   ],
+
+  // Page 2 (artist channels) — empty until batu picks the works.
+  artists: [],
 };

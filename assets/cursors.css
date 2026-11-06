@@ -1,18 +1,49 @@
-/* Custom Wii cursor pack by batuarchv — one class per cursor, plus sensible defaults. */
-html,body{cursor:url("cursors/select.png") 9 1,default;cursor:-webkit-image-set(url("cursors/select.png") 1x,url("cursors/select@2x.png") 2x) 9 1,default;cursor:image-set(url("cursors/select.png") 1x,url("cursors/select@2x.png") 2x) 9 1,default}
-a,button,[role=button],summary,label{cursor:url("cursors/link.png") 9 1,pointer;cursor:-webkit-image-set(url("cursors/link.png") 1x,url("cursors/link@2x.png") 2x) 9 1,pointer;cursor:image-set(url("cursors/link.png") 1x,url("cursors/link@2x.png") 2x) 9 1,pointer}
-p,h1,h2,h3,figcaption,.desc,.sub{cursor:url("cursors/beam.png") 20 20,text;cursor:-webkit-image-set(url("cursors/beam.png") 1x,url("cursors/beam@2x.png") 2x) 20 20,text;cursor:image-set(url("cursors/beam.png") 1x,url("cursors/beam@2x.png") 2x) 20 20,text}
-a p,button p,a h1,[role=button] p{cursor:url("cursors/link.png") 9 1,pointer;cursor:-webkit-image-set(url("cursors/link.png") 1x,url("cursors/link@2x.png") 2x) 9 1,pointer;cursor:image-set(url("cursors/link.png") 1x,url("cursors/link@2x.png") 2x) 9 1,pointer}
-button:disabled,[aria-disabled=true]{cursor:url("cursors/forbidden.png") 20 20,not-allowed;cursor:-webkit-image-set(url("cursors/forbidden.png") 1x,url("cursors/forbidden@2x.png") 2x) 20 20,not-allowed;cursor:image-set(url("cursors/forbidden.png") 1x,url("cursors/forbidden@2x.png") 2x) 20 20,not-allowed}
-.c-select,.c-select *{cursor:url("cursors/select.png") 9 1,default;cursor:-webkit-image-set(url("cursors/select.png") 1x,url("cursors/select@2x.png") 2x) 9 1,default;cursor:image-set(url("cursors/select.png") 1x,url("cursors/select@2x.png") 2x) 9 1,default}
-.c-link,.c-link *{cursor:url("cursors/link.png") 9 1,pointer;cursor:-webkit-image-set(url("cursors/link.png") 1x,url("cursors/link@2x.png") 2x) 9 1,pointer;cursor:image-set(url("cursors/link.png") 1x,url("cursors/link@2x.png") 2x) 9 1,pointer}
-.c-beam,.c-beam *{cursor:url("cursors/beam.png") 20 20,text;cursor:-webkit-image-set(url("cursors/beam.png") 1x,url("cursors/beam@2x.png") 2x) 20 20,text;cursor:image-set(url("cursors/beam.png") 1x,url("cursors/beam@2x.png") 2x) 20 20,text}
-.c-closed,.c-closed *{cursor:url("cursors/closed.png") 20 22,grabbing;cursor:-webkit-image-set(url("cursors/closed.png") 1x,url("cursors/closed@2x.png") 2x) 20 22,grabbing;cursor:image-set(url("cursors/closed.png") 1x,url("cursors/closed@2x.png") 2x) 20 22,grabbing}
-.c-open,.c-open *{cursor:url("cursors/open.png") 20 22,grab;cursor:-webkit-image-set(url("cursors/open.png") 1x,url("cursors/open@2x.png") 2x) 20 22,grab;cursor:image-set(url("cursors/open.png") 1x,url("cursors/open@2x.png") 2x) 20 22,grab}
-.c-zoom-in,.c-zoom-in *{cursor:url("cursors/zoom-in.png") 17 17,zoom-in;cursor:-webkit-image-set(url("cursors/zoom-in.png") 1x,url("cursors/zoom-in@2x.png") 2x) 17 17,zoom-in;cursor:image-set(url("cursors/zoom-in.png") 1x,url("cursors/zoom-in@2x.png") 2x) 17 17,zoom-in}
-.c-zoom-out,.c-zoom-out *{cursor:url("cursors/zoom-out.png") 17 17,zoom-out;cursor:-webkit-image-set(url("cursors/zoom-out.png") 1x,url("cursors/zoom-out@2x.png") 2x) 17 17,zoom-out;cursor:image-set(url("cursors/zoom-out.png") 1x,url("cursors/zoom-out@2x.png") 2x) 17 17,zoom-out}
-.c-forbidden,.c-forbidden *{cursor:url("cursors/forbidden.png") 20 20,not-allowed;cursor:-webkit-image-set(url("cursors/forbidden.png") 1x,url("cursors/forbidden@2x.png") 2x) 20 20,not-allowed;cursor:image-set(url("cursors/forbidden.png") 1x,url("cursors/forbidden@2x.png") 2x) 20 20,not-allowed}
-.c-help,.c-help *{cursor:url("cursors/help.png") 9 1,help;cursor:-webkit-image-set(url("cursors/help.png") 1x,url("cursors/help@2x.png") 2x) 9 1,help;cursor:image-set(url("cursors/help.png") 1x,url("cursors/help@2x.png") 2x) 9 1,help}
-.c-camera,.c-camera *{cursor:url("cursors/camera.png") 20 20,pointer;cursor:-webkit-image-set(url("cursors/camera.png") 1x,url("cursors/camera@2x.png") 2x) 20 20,pointer;cursor:image-set(url("cursors/camera.png") 1x,url("cursors/camera@2x.png") 2x) 20 20,pointer}
-.c-wait,.c-wait *{cursor:url("cursors/wait.png") 24 24,progress!important}
-a:active,button:active,[role=button]:active{cursor:url("cursors/closed.png") 20 22,grabbing;cursor:-webkit-image-set(url("cursors/closed.png") 1x,url("cursors/closed@2x.png") 2x) 20 22,grabbing;cursor:image-set(url("cursors/closed.png") 1x,url("cursors/closed@2x.png") 2x) 20 22,grabbing}
+/* Custom HiDPI Wii cursor pack by batuarchv.
+   wii-select is the main pointer everywhere; it only changes when the action changes. */
+html, body, a, button, [role=button], .tile, .pill, .round {
+  cursor: url("cursors/select.png") 9 1, default;
+  cursor: -webkit-image-set(url("cursors/select.png") 1x, url("cursors/select@2x.png") 2x) 9 1, default;
+  cursor: image-set(url("cursors/select.png") 1x, url("cursors/select@2x.png") 2x) 9 1, default;
+}
+/* leaving the site (external link / mail) → blue pointing hand */
+.c-link, .c-link * {
+  cursor: url("cursors/link.png") 9 1, pointer;
+  cursor: -webkit-image-set(url("cursors/link.png") 1x, url("cursors/link@2x.png") 2x) 9 1, pointer;
+  cursor: image-set(url("cursors/link.png") 1x, url("cursors/link@2x.png") 2x) 9 1, pointer;
+}
+/* something you can grab */
+.c-open, .c-open * {
+  cursor: url("cursors/open.png") 20 22, grab;
+  cursor: -webkit-image-set(url("cursors/open.png") 1x, url("cursors/open@2x.png") 2x) 20 22, grab;
+  cursor: image-set(url("cursors/open.png") 1x, url("cursors/open@2x.png") 2x) 20 22, grab;
+}
+.c-closed, .c-closed * {
+  cursor: url("cursors/closed.png") 20 22, grabbing !important;
+  cursor: -webkit-image-set(url("cursors/closed.png") 1x, url("cursors/closed@2x.png") 2x) 20 22, grabbing !important;
+  cursor: image-set(url("cursors/closed.png") 1x, url("cursors/closed@2x.png") 2x) 20 22, grabbing !important;
+}
+/* open an image bigger / make it small again */
+.c-zoom-in, .c-zoom-in * {
+  cursor: url("cursors/zoom-in.png") 17 17, zoom-in;
+  cursor: -webkit-image-set(url("cursors/zoom-in.png") 1x, url("cursors/zoom-in@2x.png") 2x) 17 17, zoom-in;
+  cursor: image-set(url("cursors/zoom-in.png") 1x, url("cursors/zoom-in@2x.png") 2x) 17 17, zoom-in;
+}
+.c-zoom-out, .c-zoom-out * {
+  cursor: url("cursors/zoom-out.png") 17 17, zoom-out;
+  cursor: -webkit-image-set(url("cursors/zoom-out.png") 1x, url("cursors/zoom-out@2x.png") 2x) 17 17, zoom-out;
+  cursor: image-set(url("cursors/zoom-out.png") 1x, url("cursors/zoom-out@2x.png") 2x) 17 17, zoom-out;
+}
+/* video */
+.c-camera, .c-camera * {
+  cursor: url("cursors/camera.png") 20 20, pointer;
+  cursor: -webkit-image-set(url("cursors/camera.png") 1x, url("cursors/camera@2x.png") 2x) 20 20, pointer;
+  cursor: image-set(url("cursors/camera.png") 1x, url("cursors/camera@2x.png") 2x) 20 20, pointer;
+}
+/* empty channel slot */
+.c-forbidden, .c-forbidden * {
+  cursor: url("cursors/forbidden.png") 20 20, not-allowed;
+  cursor: -webkit-image-set(url("cursors/forbidden.png") 1x, url("cursors/forbidden@2x.png") 2x) 20 20, not-allowed;
+  cursor: image-set(url("cursors/forbidden.png") 1x, url("cursors/forbidden@2x.png") 2x) 20 20, not-allowed;
+}
+/* disc is loading */
+.c-wait, .c-wait * { cursor: url("cursors/wait.png") 24 24, progress !important; }
