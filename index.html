@@ -182,10 +182,28 @@ body.booted .tile{opacity:1;animation:tileIn .6s var(--ease) backwards;animation
   background:radial-gradient(circle at 50% 30%,#fff 0 50%,#e8ecf0 100%);box-shadow:0 0 0 2px rgba(255,255,255,.7),0 6px 14px rgba(0,0,0,.35);animation:ping 2.2s ease-out infinite}
 .tvid .play::before{content:"";border-left:15px solid var(--blue);border-top:10px solid transparent;border-bottom:10px solid transparent;margin-left:5px;filter:drop-shadow(0 1px 0 rgba(255,255,255,.8))}
 @keyframes ping{0%{box-shadow:0 0 0 2px rgba(255,255,255,.7),0 6px 14px rgba(0,0,0,.35),0 0 0 0 rgba(52,189,239,.6)}80%,100%{box-shadow:0 0 0 2px rgba(255,255,255,.7),0 6px 14px rgba(0,0,0,.35),0 0 0 20px rgba(52,189,239,0)}}
-.tcur{position:relative;height:100%}
-.tcur .fly{position:absolute;width:15%;z-index:2;filter:drop-shadow(0 4px 4px rgba(0,0,0,.22));animation:fly 7s ease-in-out infinite}
-.tcur .fly.b{width:12%;animation-duration:9s;animation-delay:-3s}
-@keyframes fly{0%{left:12%;top:58%;transform:rotate(-8deg)}25%{left:62%;top:22%;transform:rotate(6deg)}50%{left:78%;top:60%;transform:rotate(-4deg)}75%{left:34%;top:30%;transform:rotate(8deg)}100%{left:12%;top:58%;transform:rotate(-8deg)}}
+.tcur{position:relative;height:100%;container-type:size}
+/* the hands keep their own shape (not stretched like tile art) and glide on transforms only */
+.tile .tcur .fly{position:absolute;left:0;top:0;z-index:2;width:16%;height:auto;aspect-ratio:1;object-fit:contain;
+  filter:drop-shadow(0 6px 5px rgba(20,40,70,.28));animation:fly 8s ease-in-out infinite;will-change:transform}
+.tile .tcur .fly.b{width:13%;animation:fly2 10s ease-in-out infinite;animation-delay:-4s}
+@keyframes fly{
+  0%{transform:translate(8cqw,48cqh) rotate(-10deg)}
+  25%{transform:translate(52cqw,10cqh) rotate(4deg)}
+  50%{transform:translate(76cqw,46cqh) rotate(-4deg)}
+  75%{transform:translate(34cqw,22cqh) rotate(8deg)}
+  100%{transform:translate(8cqw,48cqh) rotate(-10deg)}}
+@keyframes fly2{
+  0%{transform:translate(70cqw,14cqh) rotate(6deg)}
+  30%{transform:translate(30cqw,54cqh) rotate(-6deg)}
+  60%{transform:translate(12cqw,16cqh) rotate(4deg)}
+  100%{transform:translate(70cqw,14cqh) rotate(6deg)}}
+/* app channel: floating icon over a soft screenshot (Wii Shop-style) */
+.tapp{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;overflow:hidden;background:radial-gradient(120% 90% at 50% 20%,#fdfeff,#e6f1fa 60%,#cfe2f2)}
+.tile .tapp .bgk{position:absolute;inset:-6%;width:112%;height:112%;object-fit:cover;filter:blur(2.5px) saturate(1.1);opacity:.9;animation:kb 16s ease-in-out infinite alternate}
+.tapp::after{content:"";position:absolute;inset:0;z-index:1;background:radial-gradient(55% 65% at 50% 46%,rgba(255,255,255,.55),rgba(255,255,255,0) 70%),linear-gradient(180deg,rgba(255,255,255,0) 55%,rgba(20,40,70,.18))}
+.tile .tapp .ico{position:relative;z-index:2;flex:none;width:auto;height:66%;aspect-ratio:1;object-fit:contain;margin-top:-4%;filter:drop-shadow(0 12px 14px rgba(10,30,60,.32));animation:bob 4s ease-in-out infinite;
+  -webkit-box-reflect:below -4% linear-gradient(transparent 72%,rgba(255,255,255,.28))}
 .tmail{display:grid;place-items:center;height:100%;background:radial-gradient(120% 90% at 30% 20%,#fff 0%,#eef7fc 55%,#d9eef9 100%)}
 .tmail .env{width:34%;position:relative;animation:bob 3s ease-in-out infinite;filter:drop-shadow(0 6px 8px rgba(20,90,140,.18))}
 .tmail .env svg{width:100%;height:auto;display:block}
@@ -273,8 +291,10 @@ body.booted .tile{opacity:1;animation:tileIn .6s var(--ease) backwards;animation
 .fan .l{animation:fanL .8s .12s var(--ease) both}
 .fan .r{animation:fanR .8s .12s var(--ease) both}
 @keyframes rise{from{transform:translateY(40px) scale(.92);opacity:0}}
-@keyframes fanL{from{transform:none;opacity:0}to{transform:translateX(-62%) rotate(-9deg)}}
-@keyframes fanR{from{transform:none;opacity:0}to{transform:translateX(62%) rotate(9deg)}}
+/* side cards open just past the centre card's edge, whatever its shape (--off is set from the image width) */
+.fan{--off:min(16vw,217px)}
+@keyframes fanL{from{transform:none;opacity:0}to{transform:translateX(calc(-1 * var(--off))) rotate(-9deg)}}
+@keyframes fanR{from{transform:none;opacity:0}to{transform:translateX(var(--off)) rotate(9deg)}}
 .banner .name{position:absolute;left:0;right:0;bottom:calc(96px + 3vh);text-align:center;z-index:3}
 .banner .name b{display:inline-block;padding:7px 26px 8px;border-radius:99px;font-size:clamp(16px,2.2vw,24px);font-weight:800;color:#fff;text-shadow:0 1px 10px rgba(0,0,0,.35);animation:rise .6s .25s var(--ease) both;
   background:linear-gradient(180deg,rgba(255,255,255,.36),rgba(255,255,255,.12))}
@@ -564,6 +584,7 @@ function tileHTML(c, seed) {
     case 'youtube': return c.youtube ? `<div class="tvid" style="position:absolute;inset:0"><div class="kb"><img src="${ytThumb(c.youtube)}" alt="" style="--d:-6s"></div><span class="play"></span></div>` : placeholder(c);
     case 'pattern': return imgs.length ? `<div class="t80" style="position:absolute;inset:0"><div class="strip">${[-1, 0, 1, 2].map(k => `<img src="${S(imgs[0])}" alt="" style="left:${k * 100}%">`).join('')}</div>${imgs[1] ? `<div class="card"><img src="${S(imgs[1])}" alt=""></div>` : ''}</div>` : placeholder(c);
     case 'mosaic': return imgs.length ? `<div class="mos">${[0, 1, 2].map(k => rot(chunk(imgs, 3, k).slice(0, 8), seed + k)).join('')}</div>` : placeholder(c);
+    case 'app': return imgs.length ? `<div class="tapp">${imgs[1] ? `<img class="bgk" src="${S(imgs[1])}" alt="">` : ''}<img class="ico" src="${S(imgs[0])}" alt=""></div>` : placeholder(c);
     case 'cursors': return `<div class="tcur">${imgs[0] ? kb(imgs[0], t.focus, 2) : ''}<img class="fly" src="assets/cursors/deco-select.png" alt=""><img class="fly b" src="assets/cursors/deco-link.png" alt=""></div>`;
     default: return imgs.length ? `<div style="position:absolute;inset:0">${rot(imgs.slice(0, 6), seed, t.focus)}</div>` : placeholder(c);
   }
@@ -697,6 +718,13 @@ function setStage(s) {
     back.textContent = 'Wii Menu'; start.textContent = 'Start'; start.hidden = false; start.classList.remove('c-link');
   }
 }
+function spreadFan() {
+  const fan = banner.querySelector('.fan'), img = fan && fan.querySelector('.c img'), side = fan && fan.querySelector('.l,.r');
+  if (!img) return;
+  // layout sizes (offsetWidth ignores the entrance transforms), measured once the image has its real width
+  const set = () => requestAnimationFrame(() => { const cw = img.parentElement.offsetWidth, sw = side ? side.offsetWidth : 0; if (cw > 40) fan.style.setProperty('--off', Math.round(cw / 2 - sw * .1) + 'px'); });
+  img.complete && img.naturalWidth ? set() : img.addEventListener('load', set, { once: true });
+}
 function crossfade(fn) {
   if (reduce) return fn();
   fade.classList.add('on');
@@ -707,10 +735,10 @@ function openCh(id, el, toStage) {
   const c = CH[id]; if (!c) return;
   const bs = (c.banner && c.banner.style) || (c.kind === 'about' ? 'disc' : c.kind === 'contact' ? 'mail' : 'cards');
   banner.className = 'banner' + (bs === 'disc' || bs === 'mail' ? ' light' : '');
-  if (chOpen) { cur = c; banner.innerHTML = bannerHTML(c); return setStage(toStage || 'banner'); }
+  if (chOpen) { cur = c; banner.innerHTML = bannerHTML(c); spreadFan(); return setStage(toStage || 'banner'); }
   cur = c; fromEl = el || null; chOpen = true;
   document.body.classList.add('ch-open');
-  banner.innerHTML = bannerHTML(c);
+  banner.innerHTML = bannerHTML(c); spreadFan();
   setStage(toStage || 'banner');
   ch.classList.add('open'); ch.setAttribute('aria-hidden', 'false');
   const r = el && el.getBoundingClientRect && el.getBoundingClientRect();

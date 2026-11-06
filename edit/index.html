@@ -605,6 +605,7 @@ const TILE_STYLES = [
   { v: 'mosaic', t: 'Mozaik', d: '3 sütun, sırayla değişir', ico: '<i style="position:absolute;inset:6px;display:grid;grid-template-columns:repeat(3,1fr);gap:3px"><b style="background:#f0c3d8;border-radius:3px"></b><b style="background:#a8daf0;border-radius:3px"></b><b style="background:#c9e8b6;border-radius:3px"></b></i>' },
   { v: 'pattern', t: 'Kayan desen', d: '1. görsel kayar, 2. ortada kart', ico: '<i style="position:absolute;inset:0;background:repeating-linear-gradient(90deg,#d9c4ef 0 8px,#efe6f9 8px 16px)"></i><i style="position:absolute;left:35%;top:18%;width:30%;height:64%;background:#fff;border-radius:3px;box-shadow:0 2px 4px rgba(0,0,0,.2)"></i>' },
   { v: 'youtube', t: 'YouTube', d: 'Video kapağı + oynat', ico: '<i style="position:absolute;inset:0;background:#3b3f55"></i><i style="position:absolute;left:50%;top:50%;width:20px;height:20px;margin:-10px;border-radius:50%;background:#fff"></i>' },
+  { v: 'app', t: 'Uygulama', d: '1. görsel ikon, 2. arka plan', ico: '<i style="position:absolute;inset:0;background:linear-gradient(#f4f9fd,#d6e8f5)"></i><i style="position:absolute;left:38%;top:16%;width:24%;height:60%;border-radius:6px;background:linear-gradient(135deg,#fff,#bfe3f7);box-shadow:0 3px 6px rgba(0,40,80,.25)"></i>' },
   { v: 'cursors', t: 'Uçan imleçler', d: 'Görsel + Wii imleçleri', ico: `<img src="${ASSET}cursors/select@2x.png" style="position:absolute;left:20%;top:12%;width:24px"><img src="${ASSET}cursors/link@2x.png" style="position:absolute;left:58%;top:30%;width:20px">` },
 ];
 const BANNER_STYLES = [
@@ -648,8 +649,8 @@ function profileInspector() {
 function channelInspector(c) {
   const g = c.kind === 'gallery', f = find(c.id);
   const ts = (c.tile && c.tile.style) || 'slideshow', bs = (c.banner && c.banner.style) || 'cards';
-  const tileNeedsImgs = ['slideshow', 'mosaic', 'pattern', 'cursors'].includes(ts);
-  const tileHint = { slideshow: 'Boş bırakırsan kanaldaki görseller kullanılır.', mosaic: 'Boş bırakırsan kanaldaki görseller kullanılır.', pattern: '1. görsel desen olarak kayar, 2. görsel ortada kart olur.', cursors: 'Arkadaki görsel (1 tane yeter).' }[ts] || '';
+  const tileNeedsImgs = ['slideshow', 'mosaic', 'pattern', 'cursors', 'app'].includes(ts);
+  const tileHint = { slideshow: 'Boş bırakırsan kanaldaki görseller kullanılır.', mosaic: 'Boş bırakırsan kanaldaki görseller kullanılır.', pattern: '1. görsel desen olarak kayar, 2. görsel ortada kart olur.', cursors: 'Arkadaki görsel (1 tane yeter).', app: '1. görsel ortada süzülen ikon (şeffaf PNG ideal), 2. görsel arkadaki bulanık arka plan.' }[ts] || '';
   let h = `<div class="ihead"><div><small>${KIND[c.kind] || 'Kanal'}</small><h2>${esc(c.name || 'İsimsiz kanal')}</h2></div>
     <div class="rb"><button class="btn small" data-act="preview-open">Önizlemede aç</button>${g ? `<button class="btn small danger" data-act="delete">Sil</button>` : ''}</div></div>`;
   h += sec('tile', 'Temel', `
@@ -659,7 +660,7 @@ function channelInspector(c) {
   if (g) {
     h += sec('tile', 'Menüdeki kare', `${styles('tile.style', TILE_STYLES, ts)}
       ${ts === 'youtube' ? `<div class="note">Karede aşağıdaki “Kanal içi” bölümündeki YouTube videosunun kapağı görünür.</div>` : ''}
-      ${tileNeedsImgs ? `<div class="f"><span>Karedeki görseller</span>${strip('tile.images', c.tile && c.tile.images, { max: ts === 'pattern' ? 2 : ts === 'cursors' ? 1 : 12 })}<em>${tileHint}</em></div>` : ''}
+      ${tileNeedsImgs ? `<div class="f"><span>Karedeki görseller</span>${strip('tile.images', c.tile && c.tile.images, { max: ts === 'pattern' || ts === 'app' ? 2 : ts === 'cursors' ? 1 : 12 })}<em>${tileHint}</em></div>` : ''}
       ${ts === 'slideshow' || ts === 'cursors' ? `<label class="f"><span>Görselin odağı</span><select data-path="tile.focus">${FOCUS.map(([v, t]) => `<option value="${v}" ${(c.tile && c.tile.focus || '') === v ? 'selected' : ''}>${t}</option>`).join('')}</select><em>Kare yatay olduğu için dikey görsellerde hangi kısım görünsün?</em></label>` : ''}`);
     h += sec('banner', 'Açılış ekranı', `${styles('banner.style', BANNER_STYLES, bs)}
       ${bs === 'cards' ? `<div class="f"><span>Kartlar (en fazla 3)</span>${strip('banner.images', c.banner && c.banner.images, { max: 3 })}<em>1. görsel ortada büyük durur. Boş bırakırsan kanaldaki ilk 3 görsel kullanılır.</em></div>
