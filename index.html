@@ -564,7 +564,7 @@ function tileHTML(c, seed) {
     case 'youtube': return c.youtube ? `<div class="tvid" style="position:absolute;inset:0"><div class="kb"><img src="${ytThumb(c.youtube)}" alt="" style="--d:-6s"></div><span class="play"></span></div>` : placeholder(c);
     case 'pattern': return imgs.length ? `<div class="t80" style="position:absolute;inset:0"><div class="strip">${[-1, 0, 1, 2].map(k => `<img src="${S(imgs[0])}" alt="" style="left:${k * 100}%">`).join('')}</div>${imgs[1] ? `<div class="card"><img src="${S(imgs[1])}" alt=""></div>` : ''}</div>` : placeholder(c);
     case 'mosaic': return imgs.length ? `<div class="mos">${[0, 1, 2].map(k => rot(chunk(imgs, 3, k).slice(0, 8), seed + k)).join('')}</div>` : placeholder(c);
-    case 'cursors': return `<div class="tcur">${imgs[0] ? kb(imgs[0], t.focus, 2) : ''}<img class="fly" src="assets/cursors/select@2x.png" alt=""><img class="fly b" src="assets/cursors/link@2x.png" alt=""></div>`;
+    case 'cursors': return `<div class="tcur">${imgs[0] ? kb(imgs[0], t.focus, 2) : ''}<img class="fly" src="assets/cursors/deco-select.png" alt=""><img class="fly b" src="assets/cursors/deco-link.png" alt=""></div>`;
     default: return imgs.length ? `<div style="position:absolute;inset:0">${rot(imgs.slice(0, 6), seed, t.focus)}</div>` : placeholder(c);
   }
 }
