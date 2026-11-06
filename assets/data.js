@@ -1,7 +1,7 @@
 // Site content — edited with the editor at /edit. Plain JSON after the "=".
 window.PORTFOLIO = {
   "version": 2,
-  "updated": "2026-11-06T23:49:37.537Z",
+  "updated": "2026-11-06T23:52:07.927Z",
   "profile": {
     "name": "batuarchv",
     "role": "Cover artist & visual designer",
@@ -438,6 +438,86 @@ window.PORTFOLIO = {
             {
               "image": "wii-3",
               "title": "Custom Wii Cursors"
+            }
+          ]
+        },
+        {
+          "id": "prism",
+          "kind": "gallery",
+          "name": "Prism Browser",
+          "tag": "Prism",
+          "section": "App — design & build",
+          "title": "Prism",
+          "subtitle": "Liquid-glass Chromium browser for macOS · 2026",
+          "text": "A liquid-glass Chromium browser for macOS that keeps memory usage down. Tabs live in a sidebar, the window is glass, and tabs you are not using go to sleep. Designed and built by me — free and open source (GPL-3.0), with releases for Mac and Windows.",
+          "button": {
+            "label": "Get Prism",
+            "url": "https://batuarchv.github.io/Prism-Browser/"
+          },
+          "tile": {
+            "style": "app",
+            "images": [
+              "prism-icon",
+              "prism-sidebar"
+            ]
+          },
+          "banner": {
+            "style": "cards",
+            "images": [
+              "prism-sidebar",
+              "prism-spectrum",
+              "prism-lens"
+            ],
+            "background": "prism-dark"
+          },
+          "items": [
+            {
+              "image": "prism-icon",
+              "title": "App icon"
+            },
+            {
+              "image": "prism-sidebar",
+              "title": "Sidebar tabs",
+              "caption": "light"
+            },
+            {
+              "image": "prism-dark",
+              "title": "Sidebar tabs",
+              "caption": "dark"
+            },
+            {
+              "image": "prism-spectrum",
+              "title": "Spectrum",
+              "caption": "your day at a glance"
+            },
+            {
+              "image": "prism-lens",
+              "title": "Lens",
+              "caption": "peek a link over the page"
+            },
+            {
+              "image": "prism-beam",
+              "title": "Beam",
+              "caption": "⌘T for everything"
+            },
+            {
+              "image": "prism-reader",
+              "title": "Reader"
+            },
+            {
+              "image": "prism-glass-slider",
+              "title": "Liquid Glass",
+              "caption": "settings"
+            },
+            {
+              "image": "prism-shield",
+              "title": "Prism Shield",
+              "caption": "ads & trackers"
+            },
+            {
+              "image": "prism-imports",
+              "title": "Imports",
+              "caption": "Chrome, Arc, Safari…"
             }
           ]
         },

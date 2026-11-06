@@ -272,6 +272,7 @@ const API = (() => {
 })();
 const ASSET = '../assets/';
 const MAX_VIDEO_MB = 40, MAX_PER_PAGE = 12;
+const EDITOR_VERSION = 4;   // bump together with edit/version.json when the editor changes
 
 /* ════════════════════════════ tiny helpers ════════════════════════════ */
 const $ = id => document.getElementById(id);
@@ -1018,8 +1019,23 @@ function settingsModal() {
   return p;
 }
 
+/* an editor tab opened before an update must not publish with old logic */
+async function editorIsCurrent() {
+  try {
+    const v = (await (await fetch('version.json?' + Date.now(), { cache: 'no-store' })).json()).v;
+    if (v > EDITOR_VERSION) {
+      modal(`<header><h3>Editörün yeni sürümü var</h3><p>Bu sekme eski sürümle açık. Taslağın kaybolmaz — sayfayı yenileyince kaldığın yerden devam edersin.</p></header>
+        <footer><button class="btn primary" id="reloadEd">Yenile</button></footer>`, 'narrow');
+      $('reloadEd').onclick = () => location.replace(location.pathname + '?v=' + v);
+      return false;
+    }
+  } catch (_) {}
+  return true;
+}
+
 /* ════════════════════════════ publish ════════════════════════════ */
 async function publish() {
+  if (!(await editorIsCurrent())) return;
   if (!isDirty()) return toast('Yayınlanacak bir değişiklik yok ✓', 'ok');
   if (!tokenStore.get()) { const ok = await connectModal(); if (!ok) return; }
   const r = refs();
@@ -1037,9 +1053,9 @@ async function publish() {
   try {
     step('Site kontrol ediliyor');
     const cur = await gh(repoPath(`/contents/assets/data.js?ref=${BRANCH}`));
-    if (baseSha && cur.sha !== baseSha) {
+    const remoteData = parseDataJs(b64ToText(cur.content));
+    if (snapOf(remoteData) !== publishedSnap) {
       // the site changed since this draft started: merge first, show it, publish on the next press
-      const remoteData = parseDataJs(b64ToText(cur.content));
       commitHistoryNow(); mergeRemote({ data: remoteData, sha: cur.sha });
       lastSnap = JSON.stringify(data); renderLeft(); renderRight(); pushPreview(); saveDraft();
       modalClose(null); updateStatus();
@@ -1114,6 +1130,7 @@ window.addEventListener('beforeunload', e => { if (pendingInUse() > 0 && !naviga
 /* ════════════════════════════ start ════════════════════════════ */
 async function init() {
   modeHint();
+  editorIsCurrent();
   let remote = null;
   try { remote = await loadRemote(); } catch (e) { toast(ghError(e), 'bad', 6000); try { tokenStore.clear(); remote = await loadRemote(); } catch (_) {} }
   const draft = await idb.get('draft');
