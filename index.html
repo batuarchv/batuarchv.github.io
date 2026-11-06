@@ -1,0 +1,445 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>batuarchv</title>
+<meta name="description" content="batuarchv — cover artist & visual designer. Album covers, single artwork and release visuals.">
+<meta property="og:title" content="batuarchv">
+<meta property="og:description" content="Cover art & visual worlds for music.">
+<meta property="og:image" content="assets/img/80b-cover.webp">
+<link rel="icon" href="assets/img/favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;500;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/cursors.css">
+<style>
+:root{
+  --bg:#eef0f2; --stripe:#e4e7ea; --tile:#fbfbfc; --tile-edge:#c9cdd2; --ink:#5d6268; --ink-strong:#34383d;
+  --blue:#34bdef; --blue-deep:#1e9fd6; --muted:#9aa0a6;
+}
+/* Wii mode is a light theme on purpose; dark scheme only dims the stripes a touch. */
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){ --bg:#e6e8eb; --stripe:#dcdfe3; } }
+:root[data-theme="dark"]{ --bg:#e6e8eb; --stripe:#dcdfe3; }
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{
+  font:500 15px/1.45 "M PLUS Rounded 1c",system-ui,sans-serif;color:var(--ink);
+  background:var(--bg) repeating-linear-gradient(180deg,transparent 0 3px,var(--stripe) 3px 4px);
+  overflow-x:hidden;-webkit-font-smoothing:antialiased;
+}
+a{color:inherit}
+button{font:inherit;color:inherit;background:none;border:0}
+img{display:block;max-width:100%}
+
+/* =================== BOOT: disc → console =================== */
+#boot{position:fixed;inset:0;z-index:60;background:linear-gradient(90deg,#fff 0%,#f4f6f8 60%,#e8ecef 100%);overflow:hidden;transition:opacity .5s}
+#boot.gone{opacity:0;pointer-events:none}
+#boot .hint{position:absolute;left:clamp(16px,6vw,90px);top:50%;transform:translateY(-50%);max-width:min(40ch,46vw)}
+#boot .hint h1{font-size:clamp(28px,4.6vw,56px);font-weight:800;color:var(--ink-strong);line-height:1.05}
+#boot .hint p{margin-top:12px;font-size:clamp(14px,1.5vw,17px)}
+#boot .hint .go{margin-top:22px;color:var(--blue-deep);font-weight:700;animation:blink 1.6s ease-in-out infinite}
+#boot .skip{position:absolute;left:16px;bottom:14px;font-size:13px;font-weight:700;color:var(--muted);text-decoration:underline}
+@keyframes blink{50%{opacity:.35}}
+
+.console{position:absolute;right:clamp(-30px,-1vw,0px);top:50%;height:min(78vh,640px);aspect-ratio:150/620;transform:translateY(-50%);z-index:3;pointer-events:none;filter:drop-shadow(-14px 18px 24px rgba(0,0,0,.12))}
+.console svg{width:100%;height:100%;display:block}
+.console .led{opacity:.15;transition:opacity .4s}
+#boot.on .console .led{opacity:1}
+#boot.on .console .slotglow{animation:glow 1.2s ease-in-out infinite alternate}
+@keyframes glow{from{opacity:.45}to{opacity:1}}
+
+.disc{
+  position:absolute;z-index:2;width:clamp(170px,22vw,280px);aspect-ratio:1;border-radius:50%;
+  left:50%;top:50%;margin:calc(clamp(170px,22vw,280px) / -2) 0 0 calc(clamp(170px,22vw,280px) / -2);
+  background:
+    radial-gradient(circle,transparent 0 10.5%,#c9ced3 10.5% 11.5%,transparent 11.5%),
+    radial-gradient(circle,#fff 0 37%,transparent 37.5%),
+    conic-gradient(from 20deg,#e8edf2,#c7f0ff,#f6d6ff,#fff7c2,#d6ffe9,#e8edf2,#c7e4ff,#ffd6ea,#e8edf2);
+  box-shadow:inset 0 0 0 2px #fff,inset 0 0 0 4px #d6dade,0 16px 30px rgba(0,0,0,.14);
+  touch-action:none;user-select:none;
+  transition:transform .25s ease;
+}
+.disc::before{content:"";position:absolute;inset:0;border-radius:50%;background:radial-gradient(circle,transparent 0 37.5%,rgba(255,255,255,.0) 37.5%),repeating-radial-gradient(circle,rgba(255,255,255,.25) 0 1px,transparent 1px 4px);mix-blend-mode:soft-light;pointer-events:none}
+.disc .label{position:absolute;inset:16%;border-radius:50%;display:grid;place-items:center;pointer-events:none;
+  -webkit-mask:radial-gradient(circle,transparent 0 17%,#000 17.5%);mask:radial-gradient(circle,transparent 0 17%,#000 17.5%)}
+.disc .label img{width:72%;transform:translateY(6%)}
+.disc .ring{position:absolute;inset:0;border-radius:50%;pointer-events:none;
+  background:radial-gradient(circle,transparent 0 9%,#fff 9% 10%,transparent 10.5%)}
+.disc .txt{position:absolute;left:0;right:0;bottom:17%;text-align:center;font-size:clamp(9px,1vw,12px);font-weight:800;color:#2a2a7a;letter-spacing:.06em;pointer-events:none}
+.disc.idle{animation:hover 3s ease-in-out infinite}
+@keyframes hover{50%{transform:translateY(-8px) rotate(4deg)}}
+.disc.dragging{animation:none;transition:none}
+.disc.insert{animation:none;transition:transform .9s cubic-bezier(.6,.05,.3,1),opacity .2s .75s}
+.flash{position:absolute;inset:0;background:#fff;opacity:0;pointer-events:none;z-index:5;transition:opacity .45s}
+#boot.flash-on .flash{opacity:1}
+
+/* =================== MENU =================== */
+.menu{max-width:1180px;margin:0 auto;padding:clamp(64px,7vw,80px) 16px 200px}
+.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:clamp(10px,1.6vw,20px)}
+.tile{
+  position:relative;aspect-ratio:16/10;border-radius:clamp(14px,2vw,22px);background:var(--tile);
+  border:3px solid var(--tile-edge);overflow:hidden;box-shadow:inset 0 0 0 2px #fff,0 2px 0 rgba(0,0,0,.04);
+  transition:transform .15s ease,border-color .15s ease,box-shadow .15s ease;
+}
+body.booted .tile{animation:pop .45s cubic-bezier(.3,1.4,.5,1) both;animation-delay:calc(var(--i) * 45ms)}
+@keyframes pop{from{transform:scale(.6);opacity:0}}
+.tile:hover,.tile:focus-visible{transform:scale(1.04);border-color:var(--blue);box-shadow:inset 0 0 0 2px #fff,0 0 0 4px rgba(52,189,239,.25);outline:0;z-index:2}
+.tile img{width:100%;height:100%;object-fit:cover}
+.tile.empty{background:repeating-linear-gradient(180deg,#f3f4f5 0 3px,#e9ebed 3px 4px)}
+.tile.empty:hover{transform:none;border-color:var(--tile-edge);box-shadow:inset 0 0 0 2px #fff}
+.tile .label{
+  position:absolute;left:50%;bottom:8px;transform:translate(-50%,6px);opacity:0;white-space:nowrap;
+  background:#fff;border:2px solid var(--blue);color:var(--ink-strong);border-radius:99px;padding:3px 14px;font-weight:700;font-size:13px;
+  transition:opacity .15s,transform .15s;pointer-events:none;
+}
+.tile:hover .label,.tile:focus-visible .label{opacity:1;transform:translate(-50%,0)}
+.mosaic{display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(2,1fr);height:100%}
+.mosaic img{height:100%;min-height:0;object-fit:cover}
+.icon-tile{display:grid;place-items:center;height:100%;background:linear-gradient(#fff,#eef7fc)}
+.icon-tile svg,.icon-tile img{width:38%;height:auto}
+.tile .icon-tile img{width:36%;height:auto;object-fit:contain}
+.vid-tile{position:relative;height:100%}
+.vid-tile::after{content:"";position:absolute;inset:50% auto auto 50%;width:46px;height:46px;margin:-23px;border-radius:50%;background:rgba(255,255,255,.92) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M8 5v14l11-7z' fill='%2334bdef'/%3E%3C/svg%3E") center/22px no-repeat}
+.pager{display:flex;justify-content:center;gap:8px;margin-top:22px}
+.pager i{width:9px;height:9px;border-radius:50%;background:#cfd3d7}
+.pager i:first-child{background:var(--blue)}
+
+.bar{position:fixed;left:0;right:0;bottom:0;height:150px;z-index:5;pointer-events:none}
+.bar svg.shape{position:absolute;inset:0;width:100%;height:100%}
+.bar .inner{position:relative;height:100%;max-width:1180px;margin:0 auto;display:flex;align-items:flex-end;justify-content:space-between;padding:0 clamp(16px,4vw,48px) 22px}
+.round{
+  pointer-events:auto;width:clamp(64px,8vw,92px);height:clamp(64px,8vw,92px);border-radius:50%;
+  background:radial-gradient(circle at 50% 35%,#fff 0 55%,#e8eaec 100%);border:3px solid #cdd1d5;
+  display:grid;place-items:center;color:var(--ink);font-weight:800;font-size:clamp(14px,1.8vw,19px);
+  box-shadow:0 3px 0 #b9bec3;transition:border-color .15s,transform .15s;text-decoration:none;overflow:hidden
+}
+.round:hover{border-color:var(--blue);transform:translateY(-2px)}
+.round svg{width:46%}
+.round img{width:62%}
+.clock{text-align:center;margin-bottom:6px}
+.clock .t{font-size:clamp(34px,5vw,54px);font-weight:500;color:var(--muted);letter-spacing:.02em;line-height:1}
+.clock .d{font-size:clamp(14px,1.6vw,18px);color:var(--muted);margin-top:6px}
+.who{position:fixed;top:14px;left:16px;font-weight:800;color:var(--ink-strong);text-decoration:none;z-index:6;font-size:14px;line-height:1.25}
+.who small{display:block;font-weight:500;color:var(--ink);font-size:12px}
+
+/* =================== CHANNEL =================== */
+#ch{position:fixed;inset:0;z-index:20;background:#fff;display:flex;flex-direction:column;opacity:0;pointer-events:none;transform:scale(.2);transition:opacity .25s,transform .35s cubic-bezier(.3,.9,.4,1)}
+#ch.open{opacity:1;pointer-events:auto;transform:none}
+/* intro (channel start screen) */
+#ch .intro{position:relative;flex:1;overflow:hidden;display:none;background:#111}
+#ch.stage-intro .intro{display:block}
+#ch .intro .pan{position:absolute;inset:-6%;background:center/cover no-repeat;animation:pan 18s ease-in-out infinite alternate;will-change:transform}
+#ch .intro .pan.blur{filter:blur(22px) saturate(1.1);opacity:.7;inset:-10%}
+@keyframes pan{from{transform:scale(1) translate(0,0)}to{transform:scale(1.08) translate(-2%,-1%)}}
+#ch .intro .art{position:absolute;inset:0;display:grid;place-items:center;padding:24px}
+#ch .intro .art img{max-height:min(62vh,560px);max-width:min(86vw,560px);border-radius:14px;box-shadow:0 20px 50px rgba(0,0,0,.35);animation:rise .6s .1s cubic-bezier(.3,1.2,.5,1) both}
+@keyframes rise{from{transform:translateY(24px) scale(.94);opacity:0}}
+#ch .intro .ttl{position:absolute;left:0;right:0;bottom:22px;text-align:center}
+#ch .intro .ttl b{display:inline-block;background:#fff;color:var(--ink-strong);border:3px solid var(--blue);border-radius:99px;padding:6px 22px;font-size:clamp(16px,2.2vw,24px);font-weight:800;box-shadow:0 6px 18px rgba(0,0,0,.2)}
+/* content */
+#ch .body{flex:1;overflow:auto;padding:clamp(20px,4vw,48px) 16px 40px;display:none}
+#ch.stage-content .body{display:block}
+#ch .content{max-width:1080px;margin:0 auto}
+#ch h2{font-size:clamp(30px,5vw,58px);font-weight:800;color:var(--ink-strong);line-height:1.05}
+#ch .sub{color:var(--blue-deep);font-weight:700;margin-top:6px}
+#ch .desc{max-width:62ch;margin-top:14px}
+#ch .gal{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:14px;margin-top:28px}
+#ch .gal figure{border-radius:14px;overflow:hidden;border:3px solid var(--tile-edge);background:#f3f4f5;transition:border-color .15s}
+#ch .gal figure:hover{border-color:var(--blue)}
+#ch .gal img{width:100%;aspect-ratio:1;object-fit:cover}
+#ch .gal figcaption{font-size:12px;padding:6px 10px;line-height:1.3;background:#fff}
+#ch .gal figcaption span{display:block;color:var(--muted)}
+#ch .video{position:relative;aspect-ratio:16/9;border-radius:16px;overflow:hidden;margin-top:26px;border:3px solid var(--tile-edge);background:#000}
+#ch .video iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
+#ch .list{margin-top:26px;display:grid;gap:12px;max-width:560px}
+#ch .list a{display:flex;justify-content:space-between;gap:12px;background:#f6f7f8;border:3px solid var(--tile-edge);border-radius:16px;padding:14px 18px;text-decoration:none;font-weight:700;color:var(--ink-strong)}
+#ch .list a:hover{border-color:var(--blue)}
+#ch .list a span{color:var(--muted);font-weight:500}
+#ch .chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:22px}
+#ch .chips span{background:#f2f8fc;border:2px solid #cfe9f6;border-radius:99px;padding:3px 12px;font-weight:700;font-size:13px;color:var(--ink-strong)}
+#ch .mii{width:120px;height:120px;border-radius:50%;background:#fff;border:3px solid var(--tile-edge);display:grid;place-items:center;margin-bottom:18px}
+#ch .mii img{width:78%}
+#ch .foot{flex:none;border-top:3px solid #e2e5e8;background:linear-gradient(#f7f8f9,#eceef0);display:flex;justify-content:center;gap:clamp(12px,4vw,60px);padding:18px 16px}
+.pill{
+  min-width:clamp(140px,22vw,240px);padding:14px 28px;border-radius:99px;background:#fff;border:3px solid #cdd1d5;
+  font-weight:800;font-size:clamp(15px,1.8vw,19px);color:var(--ink-strong);text-align:center;text-decoration:none;box-shadow:0 3px 0 #b9bec3;transition:border-color .15s,transform .15s
+}
+.pill:hover{border-color:var(--blue);transform:translateY(-2px)}
+
+#zoom{border:0;padding:0;background:transparent;margin:auto;max-width:94vw;max-height:94vh}
+#zoom::backdrop{background:rgba(238,240,242,.94)}
+#zoom img{max-width:94vw;max-height:88vh;border-radius:14px;border:3px solid #fff;box-shadow:0 10px 40px rgba(0,0,0,.18)}
+
+@media (max-width:760px){
+  .grid{grid-template-columns:repeat(2,1fr)}
+  .tile .label{opacity:1;transform:translate(-50%,0);font-size:11px;padding:2px 10px}
+  .bar{height:118px}
+  .who small{display:none}
+  #boot .hint{top:auto;bottom:16%;transform:none;max-width:calc(100% - 120px)}
+  .disc{top:36%}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+
+<!-- ============ BOOT ============ -->
+<div id="boot" aria-label="Intro">
+  <div class="hint">
+    <h1>Insert disc.</h1>
+    <p>Drag the disc into the console on the right — or just click it.</p>
+    <p class="go">batuarchv · cover art &amp; visuals</p>
+  </div>
+  <div class="disc idle c-open" id="disc" role="button" tabindex="0" aria-label="Insert disc to enter">
+    <div class="label"><img src="assets/img/logo-face.png" alt=""></div>
+    <div class="ring"></div>
+    <div class="txt">BATUARCHV</div>
+  </div>
+  <div class="console" aria-hidden="true">
+    <svg viewBox="0 0 150 620">
+      <defs>
+        <linearGradient id="body" x1="0" x2="1">
+          <stop offset="0" stop-color="#ffffff"/><stop offset=".55" stop-color="#eef1f4"/><stop offset="1" stop-color="#cfd4d9"/>
+        </linearGradient>
+        <linearGradient id="face" x1="0" x2="1">
+          <stop offset="0" stop-color="#e6e9ec"/><stop offset="1" stop-color="#fbfcfd"/>
+        </linearGradient>
+        <linearGradient id="stand" x1="0" x2="0" y1="0" y2="1">
+          <stop offset="0" stop-color="#f4f6f8"/><stop offset="1" stop-color="#c3c8ce"/>
+        </linearGradient>
+      </defs>
+      <!-- stand -->
+      <path d="M10 588 Q12 572 40 570 H128 Q146 572 146 588 V600 Q146 612 128 612 H28 Q10 612 10 600 Z" fill="url(#stand)" stroke="#c2c7cc" stroke-width="2"/>
+      <!-- body (side) -->
+      <rect x="34" y="18" width="104" height="560" rx="16" fill="url(#body)" stroke="#c7ccd1" stroke-width="2"/>
+      <!-- front face, facing left -->
+      <rect x="20" y="18" width="26" height="560" rx="12" fill="url(#face)" stroke="#c7ccd1" stroke-width="2"/>
+      <!-- disc slot -->
+      <rect x="29" y="120" width="8" height="250" rx="4" fill="#20262c"/>
+      <rect class="led slotglow" x="30.5" y="124" width="5" height="242" rx="2.5" fill="#34bdef"/>
+      <!-- sd door + buttons -->
+      <rect x="27" y="404" width="12" height="80" rx="5" fill="#eceff2" stroke="#cfd4d9"/>
+      <circle cx="33" cy="520" r="6" fill="#f3f5f7" stroke="#bfc5cb"/>
+      <circle cx="33" cy="546" r="4.5" fill="#f3f5f7" stroke="#bfc5cb"/>
+      <circle class="led" cx="33" cy="520" r="2.2" fill="#34bdef"/>
+      <!-- side vents / highlight -->
+      <rect x="62" y="30" width="3" height="536" rx="1.5" fill="#fff" opacity=".9"/>
+      <g fill="#c9ced3" opacity=".7">
+        <rect x="110" y="70" width="14" height="3" rx="1.5"/><rect x="110" y="80" width="14" height="3" rx="1.5"/><rect x="110" y="90" width="14" height="3" rx="1.5"/>
+        <rect x="110" y="100" width="14" height="3" rx="1.5"/><rect x="110" y="110" width="14" height="3" rx="1.5"/>
+      </g>
+    </svg>
+  </div>
+  <div class="flash"></div>
+  <button class="skip c-link" id="skip">Skip intro</button>
+</div>
+
+<!-- ============ MENU ============ -->
+<a class="who c-link" href="#" data-ch="about">batuarchv<small>cover art &amp; visuals</small></a>
+
+<main class="menu">
+  <div class="grid" id="grid"></div>
+  <div class="pager" aria-hidden="true"><i></i><i></i></div>
+</main>
+
+<div class="bar">
+  <svg class="shape" viewBox="0 0 1440 150" preserveAspectRatio="none" aria-hidden="true">
+    <path d="M0 40 H300 C360 40 380 8 440 8 H1000 C1060 8 1080 40 1140 40 H1440 V150 H0 Z" fill="#e9ebed" stroke="#c4c8cc" stroke-width="3"/>
+    <path d="M0 52 H300 C360 52 380 20 440 20 H1000 C1060 20 1080 52 1140 52 H1440" fill="none" stroke="#34bdef" stroke-width="3" opacity=".7"/>
+  </svg>
+  <div class="inner">
+    <button class="round c-link" data-ch="about" aria-label="About"><img src="assets/img/logo-face.png" alt=""></button>
+    <div class="clock"><div class="t" id="time">--:--</div><div class="d" id="date"></div></div>
+    <button class="round c-link" data-ch="mail" aria-label="Message board">
+      <svg viewBox="0 0 48 36" fill="none" stroke="#9aa0a6" stroke-width="3.5" stroke-linejoin="round"><rect x="3" y="3" width="42" height="30" rx="5"/><path d="M4 6l20 15L44 6"/></svg>
+    </button>
+  </div>
+</div>
+
+<!-- ============ CHANNEL ============ -->
+<section id="ch" aria-hidden="true">
+  <div class="intro c-select"><div class="pan blur" id="ch-blur"></div><div class="art" id="ch-art"></div><div class="ttl"><b id="ch-ttl"></b></div></div>
+  <div class="body"><div class="content" id="ch-content"></div></div>
+  <div class="foot">
+    <button class="pill c-link" id="ch-back">Wii Menu</button>
+    <button class="pill c-link" id="ch-start">Start</button>
+  </div>
+</section>
+
+<dialog id="zoom" class="c-zoom-out"><img alt=""></dialog>
+
+<script src="assets/data.js"></script>
+<script>
+const D = window.PORTFOLIO, I = n => `assets/img/${n}.webp`, S = n => `assets/img/${n}-s.webp`;
+const $ = id => document.getElementById(id);
+const esc = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const F = D.featured;
+const [tape, crash, cursors] = D.highlights;
+const mail = `<svg viewBox="0 0 48 36" fill="none" stroke="#34bdef" stroke-width="3" stroke-linejoin="round"><rect x="3" y="3" width="42" height="30" rx="5"/><path d="M4 6l20 15L44 6"/></svg>`;
+
+/* ---------- channels ---------- */
+const CH = {
+  '80b': { label: '80B Channel', tile: `<img src="${S('80b-pattern')}" alt="">`, art: '80b-cover', bg: '80b-pattern',
+    title: F.title, sub: `${F.artist} · ${F.year}`, desc: F.text, video: F.video.id,
+    items: F.images.map(i => ({ src: i.src, title: i.alt })) },
+  'covers': { label: 'Covers Channel', tile: `<div class="mosaic">${['pvrty','sagoba','dur','maalemusik','nasil-inanirim','yalniz'].map(n => `<img src="${S(n)}" alt="">`).join('')}</div>`, art: 'pvrty', bg: 'sagoba',
+    title: 'Covers', sub: `${D.covers.length} releases`, desc: 'Single, EP and album artwork.', ext: ['Genius credits', 'https://genius.com/artists/batuarchv'],
+    items: D.covers.map(c => ({ src: c.src, title: c.title, meta: `${c.artist} · ${c.year}` })) },
+  'tape': { label: tape.title, tile: `<img src="${S('tape-1')}" alt="" style="object-position:center 30%">`, art: 'tape-1', bg: 'tape-2',
+    title: tape.title, sub: `${tape.artist} · ${tape.year}`, desc: tape.note + '.', ext: ['See post', tape.url],
+    items: tape.images.map(n => ({ src: n, title: tape.title })) },
+  'crash': { label: crash.title, tile: `<img src="${S('crashout')}" alt="" style="object-position:center 35%">`, art: 'crashout', bg: 'crashout',
+    title: crash.title, sub: `${crash.artist} · ${crash.year}`, desc: crash.note + '.', ext: ['Watch reel', crash.url],
+    items: crash.images.map(n => ({ src: n, title: crash.title })) },
+  'video': { label: 'YALNIZ — Music Video', tile: `<div class="vid-tile"><img src="https://i.ytimg.com/vi/${F.video.id}/hqdefault.jpg" alt=""></div>`,
+    artUrl: `https://i.ytimg.com/vi/${F.video.id}/hqdefault.jpg`, title: 'YALNIZ', sub: 'sulga & ocean · music video', desc: 'Music video from the 80B album.', video: F.video.id,
+    ext: ['Open on YouTube', `https://www.youtube.com/watch?v=${F.video.id}`] },
+  'cursors': { label: 'Wii Cursors', tile: `<img src="${S('wii-1')}" alt="">`, art: 'wii-1', bg: 'wii-2',
+    title: cursors.title, sub: cursors.note, desc: "The pointer you're holding right now. 20+ HiDPI Wii-style cursors for macOS & Windows — free on Gumroad.",
+    ext: ['Get them', cursors.url], items: cursors.images.map(n => ({ src: n, title: cursors.title })) },
+  'other': { label: 'Other Work', tile: `<div class="mosaic">${['poster-1','sagoba-merch','acab','poke-1','soulbarcode','atabeau-cd-1'].map(n => `<img src="${S(n)}" alt="">`).join('')}</div>`, art: 'poster-1', bg: 'poster-2',
+    title: 'Other work', sub: 'Merch · posters · illustration', desc: 'Things that are not (only) covers.', ext: ['Old archive', 'https://x.com/batuarchvold'],
+    items: D.other.map(o => ({ src: o.src, title: o.title, meta: o.year })) },
+  'about': { label: 'Mii Channel', tile: `<div class="icon-tile"><img src="assets/img/logo-face.png" alt=""></div>`, artUrl: 'assets/img/logo-face.png', plain: true,
+    title: 'Hi, I’m batu.', sub: D.role, desc: D.intro, about: true },
+  'mail': { label: 'Message Board', tile: `<div class="icon-tile">${mail}</div>`, plain: true, icon: mail,
+    title: 'Message Board', sub: 'Got a release coming up?', desc: 'Covers, release identities, merch, motion. Write to the work address for projects.', mail: true },
+};
+const ORDER = ['80b', 'covers', 'tape', 'crash', 'video', 'cursors', 'other', 'about', 'mail'];
+
+$('grid').innerHTML = ORDER.map((k, i) =>
+  `<div class="tile c-link" style="--i:${i}" role="button" tabindex="0" data-ch="${k}" aria-label="${esc(CH[k].label)}">${CH[k].tile}<span class="label">${esc(CH[k].label)}</span></div>`
+).join('') + Array.from({ length: 12 - ORDER.length }, (_, i) => `<div class="tile empty c-forbidden" style="--i:${ORDER.length + i}" aria-hidden="true"></div>`).join('');
+
+/* ---------- channel screen: intro → content ---------- */
+const ch = $('ch'), back = $('ch-back'), start = $('ch-start');
+let cur = null, stage = 'intro';
+
+function renderContent(c) {
+  let h = '';
+  if (c.about) h += `<div class="mii"><img src="assets/img/logo-face.png" alt=""></div>`;
+  h += `<h2>${esc(c.title)}</h2><p class="sub">${esc(c.sub)}</p><p class="desc">${esc(c.desc)}</p>`;
+  if (c.about) h += `<div class="chips">${D.clients.map(x => `<span>${esc(x)}</span>`).join('')}</div>`;
+  if (c.video) h += `<div class="video"><iframe src="https://www.youtube-nocookie.com/embed/${c.video}" title="${esc(c.title)}" allow="encrypted-media; picture-in-picture" allowfullscreen loading="lazy"></iframe></div>`;
+  if (c.mail || c.about) h += `<div class="list">
+      <a class="c-link" href="mailto:${D.workEmail}">${D.workEmail}<span>work</span></a>
+      <a class="c-link" href="mailto:${D.email}">${D.email}<span>personal</span></a>
+      ${D.links.map(l => `<a class="c-link" href="${l.url}" target="_blank" rel="noopener">${esc(l.label)}<span>↗</span></a>`).join('')}</div>`;
+  if (c.items) h += `<div class="gal">${c.items.map(it =>
+      `<figure class="c-zoom-in" data-full="${I(it.src)}"><img src="${S(it.src)}" alt="${esc(it.title)}" loading="lazy"><figcaption>${esc(it.title)}${it.meta ? `<span>${esc(it.meta)}</span>` : ''}</figcaption></figure>`).join('')}</div>`;
+  $('ch-content').innerHTML = h;
+}
+
+function setStage(s) {
+  stage = s;
+  ch.classList.toggle('stage-intro', s === 'intro');
+  ch.classList.toggle('stage-content', s === 'content');
+  if (s === 'content') {
+    renderContent(cur);
+    ch.querySelector('.body').scrollTop = 0;
+    back.textContent = 'Back';
+    if (cur.ext) { start.textContent = cur.ext[0]; start.hidden = false; } else start.hidden = true;
+  } else {
+    back.textContent = 'Wii Menu'; start.textContent = 'Start'; start.hidden = false;
+  }
+}
+
+function openCh(k, fromEl) {
+  cur = CH[k]; if (!cur) return;
+  const r = fromEl && fromEl.getBoundingClientRect ? fromEl.getBoundingClientRect() : null;
+  ch.style.transformOrigin = r ? `${r.left + r.width / 2}px ${r.top + r.height / 2}px` : '50% 50%';
+  const art = cur.artUrl || (cur.art ? I(cur.art) : '');
+  const bg = cur.bg ? S(cur.bg) : art;
+  $('ch-blur').style.backgroundImage = bg ? `url("${bg}")` : 'none';
+  $('ch-blur').style.background = cur.plain ? 'linear-gradient(#fff,#e7f5fc)' : '';
+  if (!cur.plain && bg) $('ch-blur').style.backgroundImage = `url("${bg}")`;
+  $('ch-art').innerHTML = cur.icon ? `<div style="width:min(40vw,220px)">${cur.icon}</div>` : art ? `<img src="${art}" alt="">` : '';
+  $('ch-ttl').textContent = cur.label;
+  setStage('intro');
+  ch.classList.add('open'); ch.setAttribute('aria-hidden', 'false');
+  start.focus({ preventScroll: true });
+}
+function closeCh() {
+  ch.classList.remove('open'); ch.setAttribute('aria-hidden', 'true');
+  setTimeout(() => { if (!ch.classList.contains('open')) $('ch-content').innerHTML = ''; }, 350);
+}
+back.addEventListener('click', () => stage === 'content' ? setStage('intro') : closeCh());
+start.addEventListener('click', () => {
+  if (stage === 'intro') setStage('content');
+  else if (cur.ext) window.open(cur.ext[1], cur.ext[1].startsWith('mailto') ? '_self' : '_blank', 'noopener');
+});
+$('ch-art').addEventListener('click', () => stage === 'intro' && setStage('content'));
+
+document.addEventListener('click', e => {
+  const t = e.target.closest('[data-ch]');
+  if (t) { e.preventDefault(); return openCh(t.dataset.ch, t); }
+  const f = e.target.closest('#ch figure[data-full]');
+  if (f) { $('zoom').querySelector('img').src = f.dataset.full; $('zoom').showModal(); }
+});
+$('zoom').addEventListener('click', () => $('zoom').close());
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape' && ch.classList.contains('open') && !$('zoom').open) { e.preventDefault(); stage === 'content' ? setStage('intro') : closeCh(); }
+  if ((e.key === 'Enter' || e.key === ' ') && e.target.matches('.tile[data-ch]')) { e.preventDefault(); openCh(e.target.dataset.ch, e.target); }
+});
+
+/* ---------- boot: drag or click the disc into the console ---------- */
+const boot = $('boot'), disc = $('disc');
+let booted = false;
+function finishBoot(instant) {
+  if (booted) return; booted = true;
+  try { sessionStorage.setItem('booted', '1'); } catch (_) {}
+  const reveal = () => { boot.classList.add('gone'); document.body.classList.add('booted'); setTimeout(() => boot.remove(), 600); };
+  if (instant) return reveal();
+  boot.classList.add('on');
+  setTimeout(() => boot.classList.add('flash-on'), 1150);
+  setTimeout(reveal, 1550);
+}
+function insertDisc() {
+  if (booted) return;
+  const slot = boot.querySelector('.console rect:nth-of-type(3)') || boot.querySelector('.console');
+  const sr = slot.getBoundingClientRect(), dr = disc.getBoundingClientRect();
+  const dx = sr.left + sr.width / 2 - (dr.left + dr.width / 2), dy = sr.top + sr.height / 2 - (dr.top + dr.height / 2);
+  document.body.classList.add('c-wait');
+  disc.classList.remove('idle', 'dragging'); disc.classList.add('insert');
+  disc.style.transform = `translate(${dx}px,${dy}px) perspective(600px) rotateY(84deg) scale(.86)`;
+  disc.style.opacity = '0';
+  setTimeout(() => { document.body.classList.remove('c-wait'); finishBoot(); }, 800);
+}
+let skipBoot = false; try { skipBoot = sessionStorage.getItem('booted') === '1'; } catch (_) {}
+if (skipBoot || matchMedia('(prefers-reduced-motion: reduce)').matches) finishBoot(true);
+$('skip').addEventListener('click', () => finishBoot(true));
+
+let drag = null;
+disc.addEventListener('pointerdown', e => {
+  if (booted) return;
+  drag = { x: e.clientX, y: e.clientY, moved: false };
+  disc.setPointerCapture(e.pointerId); disc.classList.add('dragging', 'c-closed'); disc.classList.remove('idle', 'c-open');
+});
+disc.addEventListener('pointermove', e => {
+  if (!drag) return;
+  const dx = e.clientX - drag.x, dy = e.clientY - drag.y;
+  if (Math.abs(dx) + Math.abs(dy) > 4) drag.moved = true;
+  disc.style.transform = `translate(${dx}px,${dy}px) rotate(${dx / 6}deg)`;
+});
+disc.addEventListener('pointerup', e => {
+  if (!drag) return;
+  const { moved } = drag; drag = null;
+  disc.classList.remove('c-closed'); disc.classList.add('c-open');
+  const cr = boot.querySelector('.console').getBoundingClientRect();
+  if (!moved || e.clientX > cr.left - 220) insertDisc();
+  else { disc.classList.remove('dragging'); disc.style.transform = ''; disc.classList.add('idle'); }
+});
+disc.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); insertDisc(); } });
+
+/* ---------- clock (updates once a minute) ---------- */
+function tick() {
+  const d = new Date();
+  $('time').textContent = d.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
+  $('date').textContent = d.toLocaleDateString('en-US', { weekday: 'short', month: 'numeric', day: 'numeric' });
+  setTimeout(tick, (60 - d.getSeconds()) * 1000);
+}
+tick();
+</script>
+</body>
+</html>
