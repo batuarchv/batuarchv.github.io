@@ -949,12 +949,46 @@ function connectModal() {
   setTimeout(() => $('tok') && $('tok').focus(), 50);
   return p;
 }
+/* ── three-way merge: keep your draft, bring in what changed on the site meanwhile ──
+   base = the site when your draft started, local = your draft, remote = the site now.
+   Per channel: new on the site → added; changed on the site but not by you → updated;
+   removed on the site and untouched by you → removed; changed by both → yours wins. */
+const sameJSON = (a, b) => JSON.stringify(a) === JSON.stringify(b);
+const snapOf = d => { const x = clone(d); delete x.updated; return JSON.stringify(x); };
+function mergeData(base, local, remote) {
+  const out = clone(local), rep = { added: [], updated: [], removed: [] };
+  const index = d => { const m = new Map(); (d.pages || []).forEach((p, pi) => (p.channels || []).forEach((c, ci) => m.set(c.id, { c, pi, ci }))); return m; };
+  const B = index(base), R = index(remote);
+  for (const [id, r] of R) {
+    const b = B.get(id), l = index(out).get(id);
+    if (!b) {
+      if (!l) { while (out.pages.length <= r.pi) out.pages.push({ channels: [] }); const list = out.pages[r.pi].channels; list.splice(Math.min(r.ci, list.length), 0, clone(r.c)); rep.added.push(r.c.name || id); }
+    } else if (!sameJSON(b.c, r.c) && l && sameJSON(b.c, l.c)) { out.pages[l.pi].channels[l.ci] = clone(r.c); rep.updated.push(r.c.name || id); }
+  }
+  for (const [id, b] of B) if (!R.has(id)) { const l = index(out).get(id); if (l && sameJSON(b.c, l.c)) { out.pages[l.pi].channels.splice(l.ci, 1); rep.removed.push(b.c.name || id); } }
+  const bp = base.profile || {}, rp = remote.profile || {}; out.profile = out.profile || {};
+  for (const k of new Set([...Object.keys(bp), ...Object.keys(rp)])) if (!sameJSON(bp[k], rp[k]) && sameJSON(bp[k], out.profile[k])) out.profile[k] = clone(rp[k]);
+  for (const k of Object.keys(remote)) if (!['pages', 'profile', 'updated'].includes(k) && !sameJSON(base[k], remote[k]) && sameJSON(base[k], local[k])) out[k] = clone(remote[k]);
+  return { data: out, rep };
+}
+// bring the draft up to date with the site; returns true if anything came in
+function mergeRemote(remote, quiet) {
+  const rs = snapOf(remote.data);
+  if (rs === publishedSnap) { baseSha = remote.sha || baseSha; return false; }
+  let base = null; try { base = publishedSnap ? JSON.parse(publishedSnap) : null; } catch (_) {}
+  if (!base) { baseSha = remote.sha || baseSha; if (!quiet) toast('Not: sitede taslağından farklı bir sürüm var.', 'warn', 6000); return false; }
+  const { data: merged, rep } = mergeData(base, data, remote.data);
+  data = merged; publishedSnap = rs; baseSha = remote.sha || baseSha;
+  const names = [...rep.added.map(n => '+ ' + n), ...rep.updated.map(n => '↻ ' + n), ...rep.removed.map(n => '− ' + n)];
+  if (!quiet) toast(names.length ? `Sitedeki yeni değişiklikler taslağına eklendi: ${names.join(', ')}` : 'Taslağın sitedeki son sürümle birleştirildi', 'ok', 7000);
+  return true;
+}
 async function syncAfterConnect() {
   const remote = await loadRemote();
   const remoteSnap = (() => { const d = clone(remote.data); delete d.updated; return JSON.stringify(d); })();
   if (remoteSnap === publishedSnap) baseSha = remote.sha;
   else if (!isDirty()) { data = remote.data; publishedSnap = remoteSnap; baseSha = remote.sha; lastSnap = JSON.stringify(data); history = []; future = []; renderLeft(); renderRight(); pushPreview(); }
-  else { baseSha = remote.sha; toast('Not: sitede senin taslağından farklı bir sürüm var. Yayınlarsan seninki geçerli olur.', 'warn', 6000); }
+  else { mergeRemote(remote); lastSnap = JSON.stringify(data); renderLeft(); renderRight(); pushPreview(); }
   repoImages = await loadRepoImages();
   saveDraft(); updateStatus();
 }
@@ -1004,10 +1038,13 @@ async function publish() {
     step('Site kontrol ediliyor');
     const cur = await gh(repoPath(`/contents/assets/data.js?ref=${BRANCH}`));
     if (baseSha && cur.sha !== baseSha) {
-      $('modal').hidden = true;
-      const go = await ask('Sitede senden sonra bir değişiklik olmuş', 'Başka bir cihazdan ya da sekmeden yayınlanmış olabilir. Seninki üstüne yazılsın mı?', 'Benimkini yayınla');
-      if (!go) { updateStatus(); return; }
-      modal(`<header><h3>Yayınlanıyor…</h3><p>Pencereyi kapatma.</p></header><div class="body"><div class="prog"><i id="pbar"></i></div><div class="plog" id="plog"></div><p class="err" id="perr"></p></div><footer id="pfoot"></footer>`, 'narrow');
+      // the site changed since this draft started: merge first, show it, publish on the next press
+      const remoteData = parseDataJs(b64ToText(cur.content));
+      commitHistoryNow(); mergeRemote({ data: remoteData, sha: cur.sha });
+      lastSnap = JSON.stringify(data); renderLeft(); renderRight(); pushPreview(); saveDraft();
+      modalClose(null); updateStatus();
+      await ask('Sitede senden sonra değişiklik olmuş', 'Bunları taslağına ekledim, seninkiler aynen duruyor. Önizlemede bir bak, sonra tekrar “Yayınla”ya bas.', 'Tamam');
+      return;
     }
     tickBar();
     const ref = await gh(repoPath(`/git/ref/heads/${BRANCH}`));
@@ -1088,7 +1125,7 @@ async function init() {
     if (remote) {
       const rs = (() => { const d = clone(remote.data); delete d.updated; return JSON.stringify(d); })();
       if (!isDirty()) { data = remote.data; publishedSnap = rs; baseSha = remote.sha; }      // nothing pending → take the live version
-      else { toast('Kaldığın yerden devam: yayınlanmamış taslağın geri yüklendi', 'ok', 4500); if (remote.sha && baseSha && remote.sha !== baseSha) toast('Not: sitede taslağından sonra değişiklik yapılmış.', 'warn', 6000); }
+      else { toast('Kaldığın yerden devam: yayınlanmamış taslağın geri yüklendi', 'ok', 4500); if (mergeRemote(remote)) saveDraft(); }
     }
   } else if (remote) {
     data = remote.data; baseSha = remote.sha;
