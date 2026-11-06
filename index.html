@@ -83,9 +83,9 @@ body.paused .view *,body.ch-open .view *,body.paused #boot *,body.ch-open .round
 
 /* ───────────────────────── menu ───────────────────────── */
 .menu{position:relative;max-width:1220px;margin:0 auto;padding:clamp(40px,6vh,72px) clamp(44px,5vw,64px) 210px}
-.pages{overflow:hidden;margin:-14px;padding:14px}
+.pages{overflow:hidden;margin:-14px 0;padding:14px 0}
 .track{display:flex;transition:transform .6s var(--ease);will-change:transform}
-.page{flex:0 0 100%;display:grid;grid-template-columns:repeat(4,1fr);gap:clamp(10px,1.5vw,20px);padding:6px;align-content:start}
+.page{flex:0 0 100%;display:grid;grid-template-columns:repeat(4,1fr);gap:clamp(10px,1.5vw,20px);padding:6px 12px;align-content:start}
 .tile{position:relative;aspect-ratio:16/10;border-radius:clamp(14px,1.8vw,22px);background:var(--tile);overflow:hidden;
   border:2px solid var(--edge);box-shadow:inset 0 0 0 3px #fff,0 2px 0 rgba(0,0,0,.035);isolation:isolate;
   transition:transform .18s var(--ease),border-color .18s,box-shadow .18s;opacity:0}
@@ -101,6 +101,8 @@ body.booted .tile{animation:tileIn .55s var(--ease) both;animation-delay:calc(va
 .tag{position:absolute;left:8px;bottom:8px;z-index:3;max-width:calc(100% - 16px);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
   background:rgba(255,255,255,.94);border:2px solid #dfe2e5;border-radius:99px;padding:1px 11px;font-size:12px;font-weight:700;color:var(--ink-strong);transition:border-color .18s}
 .tile:hover .tag,.tile:focus-visible .tag{border-color:var(--blue)}
+.tile .ph{position:absolute;inset:0;display:grid;place-items:center;padding:12px;text-align:center;font-weight:800;color:#b3b9bf;background:repeating-linear-gradient(135deg,#fafbfc 0 10px,#f1f3f5 10px 20px)}
+.tile.sel{border-color:#34bdef;box-shadow:inset 0 0 0 3px #fff,0 0 0 4px #34bdef,0 0 22px rgba(52,189,239,.5);z-index:4}
 .tile.empty{background:repeating-linear-gradient(180deg,#f6f7f8 0 3px,#eceef0 3px 4px);box-shadow:inset 0 0 0 3px rgba(255,255,255,.7)}
 
 /* tile motion: ken burns, crossfade, scroll */
@@ -187,7 +189,8 @@ body.booted .tile{animation:tileIn .55s var(--ease) both;animation-delay:calc(va
 .fan{position:absolute;inset:0;display:grid;place-items:center;perspective:1200px}
 .fan .card{grid-area:1/1;border-radius:14px;overflow:hidden;background:#000;box-shadow:0 24px 60px rgba(0,0,0,.45);border:3px solid rgba(255,255,255,.9)}
 .fan .card img,.fan .card video{width:100%;height:100%;object-fit:cover}
-.fan .c{height:min(58vh,540px);aspect-ratio:var(--ar,1);z-index:2;animation:rise .7s .05s var(--ease) both}
+.fan .c{height:min(58vh,540px);max-width:min(84vw,960px);z-index:2;animation:rise .7s .05s var(--ease) both}
+.fan .c img{width:auto;max-width:min(84vw,960px)}
 .fan .l,.fan .r{height:min(42vh,380px);aspect-ratio:1;opacity:.95}
 .fan .l{animation:fanL .8s .12s var(--ease) both}
 .fan .r{animation:fanR .8s .12s var(--ease) both}
@@ -346,7 +349,7 @@ body.booted .tile{animation:tileIn .55s var(--ease) both;animation-delay:calc(va
       <path d="M0 68.5 H52 A63.5 63.5 0 0 1 168 68.5 H220" fill="none" stroke="#34bdef" stroke-width="2"/>
       <rect x="0" y="63" width="220" height="87" fill="none"/>
     </svg>
-    <button class="round" data-ch="about" aria-label="About batuarchv"><img src="assets/img/logo-face.png" alt=""></button>
+    <button class="round" data-kind="about" aria-label="About batuarchv"><img src="assets/img/logo-face.png" alt=""></button>
   </div>
   <div class="mid">
     <div class="clock"><div class="t" id="time">--<i>:</i>--</div><div class="d" id="date"></div></div>
@@ -356,7 +359,7 @@ body.booted .tile{animation:tileIn .55s var(--ease) both;animation-delay:calc(va
       <path d="M0 61.5 H47.4 A70 70 0 0 1 172.6 61.5 H220 V150 H0 Z" fill="url(#barG)" stroke="#c4c8cc" stroke-width="3"/>
       <path d="M0 68.5 H52 A63.5 63.5 0 0 1 168 68.5 H220" fill="none" stroke="#34bdef" stroke-width="2"/>
     </svg>
-    <button class="round mail" data-ch="mail" aria-label="Message board — contact">
+    <button class="round mail" data-kind="contact" aria-label="Message board — contact">
       <svg viewBox="0 0 48 36" fill="none" stroke="#9aa0a6" stroke-width="3.5" stroke-linejoin="round"><rect x="3" y="3" width="42" height="30" rx="5"/><path d="M4 6l20 15L44 6"/></svg>
     </button>
   </div>
@@ -386,12 +389,27 @@ body.booted .tile{animation:tileIn .55s var(--ease) both;animation-delay:calc(va
 <script src="assets/data.js"></script>
 <script>
 (() => {
-const D = window.PORTFOLIO;
-const I = n => `assets/img/${n}.webp`, S = n => `assets/img/${n}-s.webp`, V = n => `assets/video/${n}.mp4`;
+/* ───────── data + editor preview hook ─────────
+   When this page runs inside the editor (/edit) with ?preview, the editor hands us its
+   unsaved draft and blob URLs for images that are not uploaded yet. */
+const QS = new URLSearchParams(location.search);
+const ED = QS.has('preview') && window.parent !== window ? (() => { try { return window.parent.__editor || null; } catch (_) { return null; } })() : null;
+let D = ED ? ED.data() : window.PORTFOLIO;
+
 const $ = id => document.getElementById(id);
 const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
-const isExt = u => /^(https?:|mailto:)/.test(u);
+function imgPath(n, small) {
+  if (!n) return '';
+  const b = ED && ED.url(n, small); if (b) return b;
+  if (/^(https?:|blob:|data:)/.test(n)) return n;
+  if (/\.\w{3,4}$/.test(n)) return 'assets/img/' + (small ? n.replace(/\.(\w+)$/, '-s.$1') : n);
+  return `assets/img/${n}${small ? '-s' : ''}.webp`;
+}
+const I = n => imgPath(n, false), S = n => imgPath(n, true);
+const V = n => (ED && ED.url('video:' + n)) || `assets/video/${n}`;
+const ytThumb = id => `https://i.ytimg.com/vi/${id}/hqdefault.jpg`;
+const P = () => D.profile || {};
 
 /* ── disc artwork (label printed with the face logo) ── */
 let discN = 0;
@@ -413,169 +431,136 @@ function discHTML(cls = '') {
 }
 const envSVG = (stroke = '#34bdef') => `<svg viewBox="0 0 48 36" fill="#fff" stroke="${stroke}" stroke-width="3" stroke-linejoin="round"><rect x="3" y="3" width="42" height="30" rx="5"/><path d="M4 6l20 15L44 6" fill="none"/></svg>`;
 
-/* ── channels ── */
-const F = D.featured, [tape, crash, curs] = D.highlights;
-const rot = (names, delay = 0) => `<div class="rot" data-delay="${delay}">${names.map((n, i) => `<img src="${S(n)}" alt="" loading="lazy" class="${i ? '' : 'on'}" style="--d:-${(delay * 3) % 14}s">`).join('')}</div>`;
-const kb = (n, pos = '', d = 0) => `<div class="kb"><img src="${S(n)}" alt="" loading="lazy" style="--d:-${d}s;${pos ? 'object-position:' + pos : ''}"></div>`;
-const coverNames = D.covers.map(c => c.src);
-const otherNames = D.other.map(o => o.src);
+/* ── channel helpers ── */
+const itemImgs = c => (c.items || []).map(i => i.image).filter(Boolean);
+const pick = (list, c) => (list && list.length ? list : itemImgs(c)).filter(Boolean);
 const chunk = (arr, n, k) => arr.filter((_, i) => i % n === k);
+const rot = (names, seed = 0, pos = '') => `<div class="rot">${names.map((n, i) => `<img src="${S(n)}" alt="" loading="lazy" class="${i ? '' : 'on'}" style="--d:-${(seed * 3) % 14}s;${pos ? 'object-position:' + pos : ''}">`).join('')}</div>`;
+const kb = (n, pos = '', d = 0) => `<div class="kb"><img src="${S(n)}" alt="" loading="lazy" style="--d:-${d}s;${pos ? 'object-position:' + pos : ''}"></div>`;
+const placeholder = c => `<div class="ph">${esc(c.tag || c.name || 'New channel')}</div>`;
 
-const CH = {
-  about: { label: 'Disc Channel', tag: 'batuarchv', kind: 'disc',
-    tile: `<div class="tdisc">${discHTML('spin')}<div><b>batuarchv</b><small>Disc Channel</small></div></div>`,
-    title: 'Hi, I’m batu.', sub: D.role, about: true },
-  '80b': { label: '80B Channel', tag: '80B', kind: '80b', cards: ['80b-cover', '80b-logo', 'yalniz'],
-    tile: `<div class="t80" style="position:absolute;inset:0"><div class="strip"><img src="${S('80b-pattern')}" alt=""><img src="${S('80b-pattern')}" alt=""></div><div class="card"><img src="${S('80b-cover')}" alt=""></div></div>`,
-    title: F.title, sub: `${F.artist} · ${F.year}`, desc: F.text, yt: F.video.id, tabText: F.kind,
-    items: F.images.map(i => ({ src: i.src, title: i.alt })) },
-  covers: { label: 'Covers Channel', tag: `Covers · ${D.covers.length}`, kind: 'marquee',
-    tile: `<div class="mos">${[0, 1, 2].map(k => rot(chunk(coverNames, 3, k).slice(0, 8), k)).join('')}</div>`,
-    title: 'Covers', sub: `${D.covers.length} releases`, desc: 'Single, EP and album artwork.', ext: ['Genius credits', 'https://genius.com/artists/batuarchv'],
-    items: D.covers.map(c => ({ src: c.src, title: c.title, meta: `${c.artist} · ${c.year}` })) },
-  tape: { label: tape.title, tag: tape.title, kind: 'cards', cards: tape.images, bg: 'tape-2', ar: '1069/1400',
-    tile: `<div style="position:absolute;inset:0">${rot(['tape-1', 'tape-2'], 1)}</div>`,
-    title: tape.title, sub: `${tape.artist} · ${tape.year}`, desc: tape.note + '.', ext: ['See post', tape.url],
-    items: tape.images.map(n => ({ src: n, title: tape.title })) },
-  crash: { label: crash.title, tag: crash.title, kind: 'cards', cards: ['crashout'], bg: 'crashout', ar: '9/16',
-    tile: kb('crashout', 'center 42%', 4),
-    title: crash.title, sub: `${crash.artist} · ${crash.year}`, desc: crash.note + '.', ext: ['Watch reel', crash.url],
-    items: crash.images.map(n => ({ src: n, title: crash.title })) },
-  video: { label: 'YALNIZ — Music Video', tag: 'YALNIZ — video', kind: 'cards', cardUrl: `https://i.ytimg.com/vi/${F.video.id}/hqdefault.jpg`, ar: '16/9', cursor: 'c-camera',
-    tile: `<div class="tvid" style="position:absolute;inset:0"><div class="kb"><img src="https://i.ytimg.com/vi/${F.video.id}/hqdefault.jpg" alt="" style="--d:-6s"></div><span class="play"></span></div>`,
-    title: 'YALNIZ', sub: 'sulga & ocean · music video · 2025', desc: 'Music video from the 80B album.', yt: F.video.id,
-    ext: ['Open on YouTube', `https://www.youtube.com/watch?v=${F.video.id}`] },
-  cursors: { label: 'Wii Cursors', tag: 'Wii Cursors', kind: 'cards', cards: curs.images, bg: 'wii-2', ar: '1/1',
-    tile: `<div class="tcur">${kb('wii-1', '', 2)}<img class="fly" src="assets/cursors/select@2x.png" alt=""><img class="fly b" src="assets/cursors/link@2x.png" alt=""></div>`,
-    title: curs.title, sub: curs.note, desc: "The pointer you're holding right now. 20+ HiDPI Wii-style cursors for macOS & Windows — free on Gumroad.",
-    ext: ['Get them', curs.url], items: curs.images.map(n => ({ src: n, title: curs.title })) },
-  other: { label: 'Other Work', tag: 'Other work', kind: 'cards', cards: ['poster-1', 'sagoba-merch', 'acab'], bg: 'poster-2',
-    tile: `<div class="mos">${[0, 1, 2].map(k => rot(chunk(otherNames, 3, k), k + 3)).join('')}</div>`,
-    title: 'Other work', sub: 'Merch · posters · illustration', desc: 'Things that are not (only) covers.', ext: ['Old archive', 'https://x.com/batuarchvold'],
-    items: D.other.map(o => ({ src: o.src, title: o.title, meta: o.year })) },
-  mail: { label: 'Message Board', tag: 'Message Board', kind: 'mail',
-    tile: `<div class="tmail"><div class="env">${envSVG()}<span class="badge">1</span></div></div>`,
-    title: 'Message Board', sub: 'Got a release coming up?', desc: 'Covers, release identities, merch, canvases and motion. Write to the work address for projects.', mail: true,
-    ext: ['Write an e-mail', 'mailto:' + D.workEmail] },
-};
-for (const a of D.artists) {
-  const imgs = a.items.filter(i => !i.video).map(i => i.src);
-  const vid = a.items.find(i => i.video);
-  CH['a-' + a.key] = { label: a.label, tag: a.label, kind: 'cards', cards: [a.art, ...imgs.filter(n => n !== a.art)].slice(0, 3), bg: a.art, video: vid && vid.video,
-    tile: `<div style="position:absolute;inset:0">${rot([a.art, ...imgs.filter(n => n !== a.art)].slice(0, 3), a.key.length)}</div>${vid ? `<video class="hv" muted loop playsinline preload="none" data-src="${V(vid.video)}"></video>` : ''}`,
-    title: a.label, sub: `${a.sub} · ${a.year}`, desc: a.desc, items: a.items.map(i => ({ ...i, meta: i.video ? 'canvas · loop' : '' })) };
+function tileHTML(c, seed) {
+  const t = c.tile || {}, style = t.style || (c.kind === 'about' ? 'disc' : c.kind === 'contact' ? 'mail' : 'slideshow');
+  const imgs = pick(t.images, c);
+  switch (style) {
+    case 'disc': return `<div class="tdisc">${discHTML('spin')}<div><b>${esc(P().name || 'batuarchv')}</b><small>${esc(c.name || 'Disc Channel')}</small></div></div>`;
+    case 'mail': return `<div class="tmail"><div class="env">${envSVG()}<span class="badge">1</span></div></div>`;
+    case 'youtube': return c.youtube ? `<div class="tvid" style="position:absolute;inset:0"><div class="kb"><img src="${ytThumb(c.youtube)}" alt="" style="--d:-6s"></div><span class="play"></span></div>` : placeholder(c);
+    case 'pattern': return imgs.length ? `<div class="t80" style="position:absolute;inset:0"><div class="strip"><img src="${S(imgs[0])}" alt=""><img src="${S(imgs[0])}" alt=""></div>${imgs[1] ? `<div class="card"><img src="${S(imgs[1])}" alt=""></div>` : ''}</div>` : placeholder(c);
+    case 'mosaic': return imgs.length ? `<div class="mos">${[0, 1, 2].map(k => rot(chunk(imgs, 3, k).slice(0, 8), seed + k)).join('')}</div>` : placeholder(c);
+    case 'cursors': return `<div class="tcur">${imgs[0] ? kb(imgs[0], t.focus, 2) : ''}<img class="fly" src="assets/cursors/select@2x.png" alt=""><img class="fly b" src="assets/cursors/link@2x.png" alt=""></div>`;
+    default: return imgs.length ? `<div style="position:absolute;inset:0">${rot(imgs.slice(0, 6), seed, t.focus)}</div>` : placeholder(c);
+  }
 }
-const PAGES = [
-  ['about', '80b', 'covers', 'tape', 'crash', 'video', 'cursors', 'other', 'mail'],
-  D.artists.map(a => 'a-' + a.key),
-].filter(p => p.length);
 
-/* ── build pages ── */
+/* ── build menu pages from data ── */
 const track = $('track');
-let n = 0;
-track.innerHTML = PAGES.map((keys, p) => {
-  const tiles = keys.map(k => {
-    const c = CH[k];
-    return `<div class="tile ${c.cursor || ''}" style="--i:${n++}" role="button" tabindex="0" data-ch="${k}" aria-label="${esc(c.label)}"><div class="view">${c.tile}</div><span class="tag">${esc(c.tag || c.label)}</span></div>`;
-  });
-  while (tiles.length < 12) tiles.push(`<div class="tile empty c-forbidden" style="--i:${n++}" aria-hidden="true"></div>`);
-  return `<section class="page" data-page="${p}" aria-label="Page ${p + 1}">${tiles.join('')}</section>`;
-}).join('');
-$('dots').innerHTML = PAGES.length > 1 ? PAGES.map((_, i) => `<button aria-label="Page ${i + 1}"></button>`).join('') : '';
-
-let page = 0;
-function goPage(p) {
+let PAGES = [], CH = {}, page = 0;
+function render() {
+  CH = {}; let n = 0, seed = 0;
+  PAGES = (D.pages || []).map(p => (p.channels || []).filter(c => !c.hidden)).filter((p, i) => i === 0 || p.length);
+  for (const p of D.pages || []) for (const c of p.channels || []) CH[c.id] = c;
+  track.innerHTML = PAGES.map((list, pi) => {
+    const tiles = list.slice(0, 12).map(c => {
+      const yt = (c.tile && c.tile.style) === 'youtube';
+      return `<div class="tile ${yt ? 'c-camera' : ''}" style="--i:${n++}" role="button" tabindex="0" data-ch="${esc(c.id)}" aria-label="${esc(c.name)}"><div class="view">${tileHTML(c, seed++)}</div><span class="tag">${esc(c.tag || c.name)}</span></div>`;
+    });
+    while (tiles.length < 12) tiles.push(`<div class="tile empty c-forbidden" style="--i:${n++}" aria-hidden="true"></div>`);
+    return `<section class="page" data-page="${pi}" aria-label="Page ${pi + 1}">${tiles.join('')}</section>`;
+  }).join('');
+  $('dots').innerHTML = PAGES.length > 1 ? PAGES.map((_, i) => `<button aria-label="Page ${i + 1}"></button>`).join('') : '';
+  [...$('dots').children].forEach((d, i) => d.onclick = () => goPage(i));
+  goPage(Math.min(page, PAGES.length - 1), true);
+}
+function goPage(p, quiet) {
   page = Math.max(0, Math.min(PAGES.length - 1, p));
   track.style.transform = `translateX(${-100 * page}%)`;
   document.querySelectorAll('.page').forEach((el, i) => { el.inert = i !== page; });
-  $('prev').hidden = page === 0; $('next').hidden = page === PAGES.length - 1;
+  $('prev').hidden = page === 0; $('next').hidden = page >= PAGES.length - 1;
   [...$('dots').children].forEach((d, i) => d.classList.toggle('on', i === page));
-  try { sessionStorage.setItem('page', page); } catch (_) {}
+  if (!quiet) try { sessionStorage.setItem('page', page); } catch (_) {}
 }
 $('prev').onclick = () => goPage(page - 1);
 $('next').onclick = () => goPage(page + 1);
-[...$('dots').children].forEach((d, i) => d.onclick = () => goPage(i));
-let startPage = 0; try { startPage = +sessionStorage.getItem('page') || 0; } catch (_) {}
-goPage(startPage);
+try { page = +sessionStorage.getItem('page') || 0; } catch (_) {}
+render();
 
 /* swipe between pages on touch */
-let sw = null;
+let sw = null, swallowClick = false;
 track.addEventListener('pointerdown', e => { if (e.pointerType !== 'mouse') sw = { x: e.clientX, y: e.clientY }; });
 track.addEventListener('pointerup', e => {
   if (!sw) return; const dx = e.clientX - sw.x, dy = e.clientY - sw.y; sw = null;
   if (Math.abs(dx) > 60 && Math.abs(dx) > Math.abs(dy) * 1.5) { goPage(page + (dx < 0 ? 1 : -1)); swallowClick = true; setTimeout(() => swallowClick = false, 50); }
 });
-let swallowClick = false;
 
-/* crossfade rotators — only on the visible page, only when nothing is open */
+/* crossfade slideshows — only on the visible page, only when nothing is open */
 let tick = 0;
 setInterval(() => {
   if (document.hidden || chOpen || reduce) return;
   tick++;
   document.querySelectorAll(`.page[data-page="${page}"] .rot`).forEach((r, idx) => {
-    if ((tick + idx) % 2) return;            // stagger so tiles don't change in lockstep
+    if ((tick + idx) % 2) return;
     const imgs = r.children; if (imgs.length < 2) return;
     const cur = [...imgs].findIndex(i => i.classList.contains('on'));
     imgs[cur].classList.remove('on'); imgs[(cur + 1) % imgs.length].classList.add('on');
   });
 }, 1700);
 
-/* hover-preview canvases on artist tiles */
-track.addEventListener('pointerover', e => {
-  const t = e.target.closest('.tile'); const v = t && t.querySelector('video.hv'); if (!v || reduce) return;
-  if (!v.src) v.src = v.dataset.src;
-  v.play().then(() => v.classList.add('on')).catch(() => {});
-});
-track.addEventListener('pointerout', e => {
-  const t = e.target.closest('.tile'); if (!t || t.contains(e.relatedTarget)) return;
-  const v = t.querySelector('video.hv'); if (v) { v.pause(); v.classList.remove('on'); }
-});
-
 /* ── channel: zoom from tile → banner → (Start) → inside ── */
 const ch = $('ch'), banner = $('banner'), inside = $('inside'), fade = $('fade'), back = $('chBack'), start = $('chStart');
-let cur = null, curKey = null, fromEl = null, chOpen = false, stage = 'banner';
+let cur = null, fromEl = null, chOpen = false, stage = 'banner';
 
 function bannerHTML(c) {
-  const name = `<div class="name"><b id="chName">${esc(c.label)}</b><small>${esc(c.sub || '')}</small></div>`;
-  if (c.kind === 'disc') return `<div class="bg light" style="background:linear-gradient(160deg,#fff,#e5f3fb)"></div><div class="bdisc">${discHTML('spin')}</div>${name}`;
-  if (c.kind === 'mail') return `<div class="bmail"><div class="env"><div class="letter"><i></i><i></i><i></i><i></i></div>${envSVG('#9aa0a6')}</div></div>${name}`;
-  if (c.kind === 'marquee') {
-    const a = coverNames.slice(0, 14), b = coverNames.slice(14, 28);
-    const row = (arr, rev) => `<div class="row${rev ? ' rev' : ''}">${[...arr, ...arr].map(n => `<img src="${S(n)}" alt="">`).join('')}</div>`;
-    return `<div class="marquee">${row(a)}${row(b, 1)}${row(a.slice().reverse())}</div>${name}`;
+  const b = c.banner || {};
+  const style = b.style || (c.kind === 'about' ? 'disc' : c.kind === 'contact' ? 'mail' : 'cards');
+  const name = `<div class="name"><b id="chName">${esc(c.name)}</b><small>${esc(c.subtitle || '')}</small></div>`;
+  if (style === 'disc') return `<div class="bg light" style="background:linear-gradient(160deg,#fff,#e5f3fb)"></div><div class="bdisc">${discHTML('spin')}</div>${name}`;
+  if (style === 'mail') return `<div class="bmail"><div class="env"><div class="letter"><i></i><i></i><i></i><i></i></div>${envSVG('#9aa0a6')}</div></div>${name}`;
+  if (style === 'marquee') {
+    const all = pick(b.images, c); if (!all.length) return name;
+    const half = Math.ceil(all.length / 2), a = all.slice(0, Math.min(half, 14)), z = all.slice(half, half + 14).length ? all.slice(half, half + 14) : a.slice().reverse();
+    const row = (arr, rev) => `<div class="row${rev ? ' rev' : ''}">${[...arr, ...arr, ...arr].map(n => `<img src="${S(n)}" alt="">`).join('')}</div>`;
+    return `<div class="marquee">${row(a)}${row(z, 1)}${row(a.slice().reverse())}</div>${name}`;
   }
-  const bg = c.kind === '80b' ? `<div class="bgstrip"><img src="${S('80b-pattern')}" alt=""><img src="${S('80b-pattern')}" alt=""></div>`
-                              : `<div class="bg" style="background-image:url('${c.cardUrl || S(c.bg || c.cards[0])}')"></div>`;
-  const cards = c.cards || [];
-  const center = c.video ? `<div class="card c" style="--ar:9/16"><video src="${V(c.video)}" muted loop playsinline autoplay poster="${S(c.bg)}"></video></div>`
-               : c.cardUrl ? `<div class="card c" style="--ar:${c.ar}"><img src="${c.cardUrl}" alt=""></div>`
-               : `<div class="card c" style="--ar:${c.ar || '1'}"><img src="${I(cards[0])}" alt=""></div>`;
-  const sideL = cards[1] ? `<div class="card l"><img src="${S(cards[1])}" alt=""></div>` : '';
-  const sideR = cards[2] ? `<div class="card r"><img src="${S(cards[2])}" alt=""></div>` : (c.video && cards[0] ? `<div class="card r"><img src="${S(cards[0])}" alt=""></div>` : '');
-  return `${bg}<div class="fan">${sideL}${sideR}${center}</div>${name}`;
+  if (style === 'youtube' && c.youtube) {
+    return `<div class="bg" style="background-image:url('${ytThumb(c.youtube)}')"></div><div class="fan"><div class="card c"><img src="${ytThumb(c.youtube)}" alt=""></div></div>${name}`;
+  }
+  const cards = pick(b.images, c).slice(0, 3);
+  const bgImg = b.background || cards[0];
+  const bg = !bgImg ? '' : b.backgroundStyle === 'scroll'
+    ? `<div class="bgstrip"><img src="${S(bgImg)}" alt=""><img src="${S(bgImg)}" alt=""></div>`
+    : `<div class="bg" style="background-image:url('${S(bgImg)}')"></div>`;
+  const side = (n, cls) => n ? `<div class="card ${cls}"><img src="${S(n)}" alt=""></div>` : '';
+  return `${bg}<div class="fan">${side(cards[1], 'l')}${side(cards[2], 'r')}${cards[0] ? `<div class="card c"><img src="${I(cards[0])}" alt=""></div>` : ''}</div>${name}`;
 }
 
+function contactList() {
+  const p = P();
+  return `<div class="list">
+    ${p.workEmail ? `<a class="c-link" href="mailto:${esc(p.workEmail)}">${esc(p.workEmail)}<span>work</span></a>` : ''}
+    ${p.email ? `<a class="c-link" href="mailto:${esc(p.email)}">${esc(p.email)}<span>personal</span></a>` : ''}
+    ${(p.links || []).map(l => `<a class="c-link" href="${esc(l.url)}" target="_blank" rel="noopener">${esc(l.label)}<span>↗</span></a>`).join('')}</div>`;
+}
 function insideHTML(c) {
+  const p = P();
   let h = `<div class="wrap">`;
-  if (c.about) {
-    h += `<div class="about">${discHTML('spin')}<div class="head" style="display:block"><span class="tab">Disc Channel</span><h2>${esc(c.title)}</h2><p class="sub">${esc(c.sub)}</p><p class="desc">${esc(D.intro)}</p></div></div>
-      <div class="chips">${D.clients.map(x => `<span>${esc(x)}</span>`).join('')}</div>`;
+  if (c.kind === 'about') {
+    h += `<div class="about">${discHTML('spin')}<div class="head" style="display:block"><span class="tab">${esc(c.name)}</span><h2>${esc(c.title)}</h2><p class="sub">${esc(c.subtitle || p.role)}</p><p class="desc">${esc(c.text || p.intro)}</p></div></div>
+      <div class="chips">${(p.clients || []).map(x => `<span>${esc(x)}</span>`).join('')}</div>${contactList()}`;
   } else {
-    h += `<div class="head"><div><span class="tab">${esc(c.tabText || c.label)}</span><h2>${esc(c.title)}</h2><p class="sub">${esc(c.sub)}</p></div></div><p class="desc">${esc(c.desc)}</p>`;
+    h += `<div class="head"><div><span class="tab">${esc(c.section || c.name)}</span><h2>${esc(c.title)}</h2>${c.subtitle ? `<p class="sub">${esc(c.subtitle)}</p>` : ''}</div></div>${c.text ? `<p class="desc">${esc(c.text)}</p>` : ''}`;
+    if (c.youtube) h += `<div class="yt"><iframe src="https://www.youtube-nocookie.com/embed/${esc(c.youtube)}" title="${esc(c.title)} — video" allow="encrypted-media; picture-in-picture; fullscreen" allowfullscreen loading="lazy"></iframe></div>`;
+    if (c.kind === 'contact') h += contactList();
   }
-  if (c.yt) h += `<div class="yt"><iframe src="https://www.youtube-nocookie.com/embed/${c.yt}" title="${esc(c.title)} — video" allow="encrypted-media; picture-in-picture; fullscreen" allowfullscreen loading="lazy"></iframe></div>`;
-  if (c.mail || c.about) h += `<div class="list">
-      <a class="c-link" href="mailto:${D.workEmail}">${D.workEmail}<span>work</span></a>
-      <a class="c-link" href="mailto:${D.email}">${D.email}<span>personal</span></a>
-      ${D.links.map(l => `<a class="c-link" href="${l.url}" target="_blank" rel="noopener">${esc(l.label)}<span>↗</span></a>`).join('')}</div>`;
-  if (c.items) h += `<div class="gal">${c.items.map((it, i) => `<figure class="c-zoom-in" data-i="${i}" tabindex="0" role="button" aria-label="Open ${esc(it.title)}">
-      <div class="m">${it.video ? `<video muted loop playsinline preload="none" poster="${S(it.src)}" data-src="${V(it.video)}"></video>` : `<img src="${S(it.src)}" alt="${esc(it.title)}" loading="lazy">`}</div>
-      ${it.video ? '<span class="badge">CANVAS</span>' : ''}
-      <figcaption>${esc(it.title)}${it.meta ? `<span>${esc(it.meta)}</span>` : ''}</figcaption></figure>`).join('')}</div>`;
+  const items = c.items || [];
+  if (items.length) h += `<div class="gal">${items.map((it, i) => `<figure class="c-zoom-in" data-i="${i}" tabindex="0" role="button" aria-label="Open ${esc(it.title)}">
+      <div class="m">${it.video ? `<video muted loop playsinline preload="none" poster="${S(it.image)}" data-src="${V(it.video)}"></video>` : `<img src="${S(it.image)}" alt="${esc(it.title)}" loading="lazy">`}</div>
+      ${it.video ? '<span class="badge">VIDEO</span>' : ''}
+      <figcaption>${esc(it.title)}${it.caption ? `<span>${esc(it.caption)}</span>` : ''}</figcaption></figure>`).join('')}</div>`;
   return h + '</div>';
 }
 
-/* play inline canvases only while they're on screen */
+/* play inline videos only while they're on screen */
 const io = new IntersectionObserver(es => es.forEach(e => {
   const v = e.target;
   if (e.isIntersecting) { if (!v.src) v.src = v.dataset.src; v.play().catch(() => {}); } else v.pause();
@@ -587,13 +572,12 @@ function setStage(s) {
   if (s === 'inside') {
     inside.innerHTML = insideHTML(cur); inside.scrollTop = 0;
     inside.querySelectorAll('video[data-src]').forEach(v => io.observe(v));
-    banner.querySelectorAll('video').forEach(v => v.pause());
     back.textContent = 'Back';
-    if (cur.ext) { start.textContent = cur.ext[0]; start.hidden = false; start.classList.add('c-link'); } else start.hidden = true;
+    const btn = cur.button && cur.button.url && cur.button.label;
+    start.hidden = !btn; if (btn) { start.textContent = cur.button.label; start.classList.add('c-link'); }
   } else {
     inside.querySelectorAll('video').forEach(v => { io.unobserve(v); v.pause(); });
     inside.innerHTML = '';
-    banner.querySelectorAll('video').forEach(v => v.play().catch(() => {}));
     back.textContent = 'Wii Menu'; start.textContent = 'Start'; start.hidden = false; start.classList.remove('c-link');
   }
 }
@@ -602,33 +586,32 @@ function crossfade(fn) {
   fade.classList.add('on');
   setTimeout(() => { fn(); requestAnimationFrame(() => fade.classList.remove('on')); }, 230);
 }
-function rectTransform(r) {
-  const sx = r.width / innerWidth, sy = r.height / innerHeight;
-  return `translate(${r.left}px,${r.top}px) scale(${sx},${sy})`;
-}
-function openCh(key, el) {
-  const c = CH[key]; if (!c || chOpen) return;
-  cur = c; curKey = key; fromEl = el || null; chOpen = true;
+const rectTransform = r => `translate(${r.left}px,${r.top}px) scale(${r.width / innerWidth},${r.height / innerHeight})`;
+function openCh(id, el, toStage) {
+  const c = CH[id]; if (!c) return;
+  const bs = (c.banner && c.banner.style) || (c.kind === 'about' ? 'disc' : c.kind === 'contact' ? 'mail' : 'cards');
+  banner.className = 'banner' + (bs === 'disc' || bs === 'mail' ? ' light' : '');
+  if (chOpen) { cur = c; banner.innerHTML = bannerHTML(c); return setStage(toStage || 'banner'); }
+  cur = c; fromEl = el || null; chOpen = true;
   document.body.classList.add('ch-open');
-  banner.className = 'banner' + (c.kind === 'disc' || c.kind === 'mail' ? ' light' : '');
   banner.innerHTML = bannerHTML(c);
-  setStage('banner');
+  setStage(toStage || 'banner');
   ch.classList.add('open'); ch.setAttribute('aria-hidden', 'false');
   const r = el && el.getBoundingClientRect && el.getBoundingClientRect();
-  if (r && !reduce) {
+  if (r && r.width && !reduce && !toStage) {
     ch.animate([{ transform: rectTransform(r), borderRadius: '40px', opacity: .6 }, { transform: 'none', borderRadius: '0px', opacity: 1 }],
       { duration: 460, easing: 'cubic-bezier(.2,.85,.25,1)' });
   }
-  start.focus({ preventScroll: true });
+  if (!ED) start.focus({ preventScroll: true });
 }
-function closeCh() {
+function closeCh(instant) {
   if (!chOpen) return;
   const finish = () => {
     ch.classList.remove('open', 'in'); ch.setAttribute('aria-hidden', 'true');
     banner.innerHTML = ''; inside.innerHTML = ''; chOpen = false; document.body.classList.remove('ch-open');
-    if (fromEl && fromEl.focus) fromEl.focus({ preventScroll: true });
+    if (fromEl && fromEl.focus && !ED) fromEl.focus({ preventScroll: true });
   };
-  const r = fromEl && fromEl.isConnected && fromEl.getBoundingClientRect();
+  const r = !instant && fromEl && fromEl.isConnected && fromEl.getBoundingClientRect();
   if (r && r.width && !reduce) {
     ch.animate([{ transform: 'none', borderRadius: '0px', opacity: 1 }, { transform: rectTransform(r), borderRadius: '40px', opacity: .4 }],
       { duration: 380, easing: 'cubic-bezier(.5,0,.75,0)' }).onfinish = finish;
@@ -637,7 +620,8 @@ function closeCh() {
 back.addEventListener('click', () => stage === 'inside' ? crossfade(() => setStage('banner')) : closeCh());
 start.addEventListener('click', () => {
   if (stage === 'banner') return crossfade(() => setStage('inside'));
-  if (cur.ext) { const u = cur.ext[1]; u.startsWith('mailto') ? (location.href = u) : window.open(u, '_blank', 'noopener'); }
+  const u = cur.button && cur.button.url; if (!u) return;
+  u.startsWith('mailto') ? (location.href = u) : window.open(u, '_blank', 'noopener');
 });
 banner.addEventListener('click', () => stage === 'banner' && crossfade(() => setStage('inside')));
 
@@ -648,9 +632,9 @@ function showV(i) {
   vIdx = (i + vItems.length) % vItems.length;
   const it = vItems[vIdx];
   vStage.innerHTML = it.video
-    ? `<video class="media" src="${V(it.video)}" poster="${S(it.src)}" autoplay muted loop playsinline controls></video>`
-    : `<img class="media c-zoom-out" src="${I(it.src)}" alt="${esc(it.title)}">`;
-  $('vCap').innerHTML = `${esc(it.title)}<span>${vIdx + 1} / ${vItems.length}${it.meta ? ' · ' + esc(it.meta) : ''}</span>`;
+    ? `<video class="media" src="${V(it.video)}" poster="${S(it.image)}" autoplay muted loop playsinline controls></video>`
+    : `<img class="media c-zoom-out" src="${I(it.image)}" alt="${esc(it.title)}">`;
+  $('vCap').innerHTML = `${esc(it.title)}<span>${vIdx + 1} / ${vItems.length}${it.caption ? ' · ' + esc(it.caption) : ''}</span>`;
   $('vPrev').hidden = $('vNext').hidden = vItems.length < 2;
 }
 function openV(items, i) { vItems = items; viewer.classList.add('open'); showV(i); $('vClose').focus({ preventScroll: true }); }
@@ -664,10 +648,17 @@ vStage.addEventListener('pointerdown', e => { vs = e.clientX; });
 vStage.addEventListener('pointerup', e => { if (vs == null) return; const dx = e.clientX - vs; vs = null; if (Math.abs(dx) > 60) { e.stopPropagation(); showV(vIdx + (dx < 0 ? 1 : -1)); } });
 
 /* ── global clicks & keys ── */
+const byKind = k => { for (const p of D.pages || []) for (const c of p.channels || []) if (c.kind === k) return c.id; };
 document.addEventListener('click', e => {
   if (swallowClick) return;
-  const t = e.target.closest('[data-ch]');
-  if (t && !chOpen) { e.preventDefault(); return openCh(t.dataset.ch, t.classList.contains('tile') ? t : null); }
+  const k = e.target.closest('[data-kind]');
+  if (k && !chOpen) { const id = byKind(k.dataset.kind); if (id) openCh(id, null); return; }
+  const t = e.target.closest('.tile[data-ch]');
+  if (t && !chOpen) {
+    e.preventDefault();
+    if (ED && ED.mode() === 'select') return ED.select(t.dataset.ch);
+    return openCh(t.dataset.ch, t);
+  }
   const f = e.target.closest('#inside figure[data-i]');
   if (f) openV(cur.items, +f.dataset.i);
 });
@@ -689,8 +680,8 @@ document.addEventListener('keydown', e => {
 document.addEventListener('visibilitychange', () => document.body.classList.toggle('paused', document.hidden));
 
 /* ── boot: drag (or click) the disc into the slot ── */
-const boot = $('boot'), disc = $('bootDisc');
-disc.outerHTML = discHTML('float c-open').replace('<div class="disc', '<div id="bootDisc" role="button" tabindex="0" aria-label="Insert the disc to enter the site" class="disc');
+const boot = $('boot');
+$('bootDisc').outerHTML = discHTML('float c-open').replace('<div class="disc', '<div id="bootDisc" role="button" tabindex="0" aria-label="Insert the disc to enter the site" class="disc');
 const bd = $('bootDisc');
 let booted = false;
 function reveal(instant) {
@@ -707,7 +698,7 @@ function insert(dx = 0, dy = 0) {
   bd.classList.remove('float', 'c-open', 'c-closed');
   const slot = boot.querySelector('.slot').getBoundingClientRect();
   const r = bd.getBoundingClientRect();
-  const cx = r.left + r.width / 2 - dx, cy = r.top + r.height / 2 - dy;           // disc centre without the drag offset
+  const cx = r.left + r.width / 2 - dx, cy = r.top + r.height / 2 - dy;
   const tx = slot.left + slot.width / 2 - cx, ty = slot.top + slot.height / 2 - cy, w = r.width;
   const T = (x, y, ry, rz) => `translate(${x}px,${y}px) perspective(1000px) rotateY(${ry}deg) rotate(${rz}deg)`;
   const a = bd.animate([
@@ -722,7 +713,7 @@ function insert(dx = 0, dy = 0) {
   }, 880);
   a.onfinish = () => setTimeout(() => reveal(false), 650);
 }
-let skip = false; try { skip = sessionStorage.getItem('booted') === '1'; } catch (_) {}
+let skip = !!ED; try { skip = skip || sessionStorage.getItem('booted') === '1'; } catch (_) {}
 if (skip || reduce) reveal(true);
 $('skip').onclick = () => reveal(true);
 
@@ -760,12 +751,30 @@ bd.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { 
 /* ── clock ── */
 function clock() {
   const d = new Date();
-  const hh = String(d.getHours()).padStart(2, '0'), mm = String(d.getMinutes()).padStart(2, '0');
-  $('time').innerHTML = `${hh}<i>:</i>${mm}`;
+  $('time').innerHTML = `${String(d.getHours()).padStart(2, '0')}<i>:</i>${String(d.getMinutes()).padStart(2, '0')}`;
   $('date').textContent = d.toLocaleDateString('en-US', { weekday: 'short', month: 'numeric', day: 'numeric' });
   setTimeout(clock, (60 - d.getSeconds()) * 1000 + 50);
 }
 clock();
+
+/* ── API for the editor's live preview ── */
+window.__site = {
+  render(data) {
+    D = data; const openId = chOpen && cur && cur.id, st = stage;
+    render();
+    if (openId && CH[openId]) { const y = inside.scrollTop; openCh(openId, null, st); inside.scrollTop = y; }
+    else if (openId) closeCh(true);
+  },
+  open(id, st) { const c = CH[id]; if (!c) return; this.page(id); openCh(id, document.querySelector(`.tile[data-ch="${CSS.escape(id)}"]`), st || 'banner'); },
+  close() { closeV(); closeCh(true); },
+  page(id) { const pi = PAGES.findIndex(l => l.some(c => c.id === id)); if (pi >= 0 && pi !== page) goPage(pi, true); },
+  highlight(id) {
+    document.querySelectorAll('.tile.sel').forEach(t => t.classList.remove('sel'));
+    if (!id) return; this.page(id);
+    const t = document.querySelector(`.tile[data-ch="${CSS.escape(id)}"]`); if (t) t.classList.add('sel');
+  },
+};
+if (ED && ED.ready) ED.ready();
 })();
 </script>
 </body>
