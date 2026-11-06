@@ -1,7 +1,7 @@
 // Site content — edited with the editor at /edit. Plain JSON after the "=".
 window.PORTFOLIO = {
   "version": 2,
-  "updated": "2026-11-06T22:16:41.815Z",
+  "updated": "2026-11-06T23:49:37.537Z",
   "profile": {
     "name": "batuarchv",
     "role": "Cover artist & visual designer",
@@ -30,15 +30,15 @@ window.PORTFOLIO = {
       "sulga",
       "VONN",
       "kerem.",
-      "ocean",
+      "7even",
       "BEBO",
-      "Godelieve",
-      "Shawnigan",
       "Se7en of 34",
-      "tunedbugra",
+      "shane-p",
+      "bxrke",
       "kagan",
-      "Kidkubi",
-      "atabeau"
+      "atabeau",
+      "yaman",
+      "Asil Slang"
     ]
   },
   "pages": [
@@ -56,7 +56,8 @@ window.PORTFOLIO = {
           },
           "banner": {
             "style": "disc"
-          }
+          },
+          "hidden": true
         },
         {
           "id": "80b",
@@ -135,6 +136,24 @@ window.PORTFOLIO = {
               "title": "Promo photo"
             }
           ]
+        },
+        {
+          "id": "ch-9nkik",
+          "kind": "gallery",
+          "name": "YOLO",
+          "tag": "YOLO - kerem.",
+          "title": "Yeni kanal",
+          "subtitle": "",
+          "text": "",
+          "items": [],
+          "tile": {
+            "style": "slideshow",
+            "images": []
+          },
+          "banner": {
+            "style": "cards",
+            "images": []
+          }
         },
         {
           "id": "covers",
@@ -286,7 +305,7 @@ window.PORTFOLIO = {
           "tag": "Tape Canavarı 3000",
           "title": "Tape Canavarı 3000",
           "subtitle": "Se7en of 34 · 2026",
-          "text": "Release campaign — my most-liked post (900+).",
+          "text": "Release campaign — Cover",
           "button": {
             "label": "See post",
             "url": "https://www.instagram.com/p/DcjeJHTDC_3/"
@@ -361,12 +380,12 @@ window.PORTFOLIO = {
         {
           "id": "yalniz",
           "kind": "gallery",
-          "name": "YALNIZ — Music Video",
-          "tag": "YALNIZ — video",
-          "title": "YALNIZ",
-          "subtitle": "sulga & ocean · music video · 2025",
+          "name": "UYUMA — Music Video",
+          "tag": "UYUMA — video",
+          "title": "UYUMA",
+          "subtitle": "sulga · music video · 2025",
           "text": "Music video from the 80B album.",
-          "youtube": "BQtHUmRcaS8",
+          "youtube": "Y0g8vlKtbV4",
           "button": {
             "label": "Open on YouTube",
             "url": "https://www.youtube.com/watch?v=BQtHUmRcaS8"
@@ -377,7 +396,8 @@ window.PORTFOLIO = {
           "banner": {
             "style": "youtube"
           },
-          "items": []
+          "items": [],
+          "section": "UYUMA - Music Video"
         },
         {
           "id": "cursors",
@@ -418,86 +438,6 @@ window.PORTFOLIO = {
             {
               "image": "wii-3",
               "title": "Custom Wii Cursors"
-            }
-          ]
-        },
-        {
-          "id": "prism",
-          "kind": "gallery",
-          "name": "Prism Browser",
-          "tag": "Prism",
-          "section": "App — design & build",
-          "title": "Prism",
-          "subtitle": "Liquid-glass Chromium browser for macOS · 2026",
-          "text": "A liquid-glass Chromium browser for macOS that keeps memory usage down. Tabs live in a sidebar, the window is glass, and tabs you are not using go to sleep. Designed and built by me — free and open source (GPL-3.0), with releases for Mac and Windows.",
-          "button": {
-            "label": "Get Prism",
-            "url": "https://batuarchv.github.io/Prism-Browser/"
-          },
-          "tile": {
-            "style": "app",
-            "images": [
-              "prism-icon",
-              "prism-sidebar"
-            ]
-          },
-          "banner": {
-            "style": "cards",
-            "images": [
-              "prism-sidebar",
-              "prism-spectrum",
-              "prism-lens"
-            ],
-            "background": "prism-dark"
-          },
-          "items": [
-            {
-              "image": "prism-icon",
-              "title": "App icon"
-            },
-            {
-              "image": "prism-sidebar",
-              "title": "Sidebar tabs",
-              "caption": "light"
-            },
-            {
-              "image": "prism-dark",
-              "title": "Sidebar tabs",
-              "caption": "dark"
-            },
-            {
-              "image": "prism-spectrum",
-              "title": "Spectrum",
-              "caption": "your day at a glance"
-            },
-            {
-              "image": "prism-lens",
-              "title": "Lens",
-              "caption": "peek a link over the page"
-            },
-            {
-              "image": "prism-beam",
-              "title": "Beam",
-              "caption": "⌘T for everything"
-            },
-            {
-              "image": "prism-reader",
-              "title": "Reader"
-            },
-            {
-              "image": "prism-glass-slider",
-              "title": "Liquid Glass",
-              "caption": "settings"
-            },
-            {
-              "image": "prism-shield",
-              "title": "Prism Shield",
-              "caption": "ads & trackers"
-            },
-            {
-              "image": "prism-imports",
-              "title": "Imports",
-              "caption": "Chrome, Arc, Safari…"
             }
           ]
         },
@@ -651,7 +591,8 @@ window.PORTFOLIO = {
           },
           "banner": {
             "style": "mail"
-          }
+          },
+          "hidden": true
         }
       ]
     },
