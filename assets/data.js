@@ -1,7 +1,7 @@
 // Site content — edited with the editor at /edit. Plain JSON after the "=".
 window.PORTFOLIO = {
   "version": 2,
-  "updated": "2026-11-07T21:35:01.667Z",
+  "updated": "2026-11-07T21:36:10.205Z",
   "profile": {
     "name": "batuarchv",
     "role": "Cover artist & visual designer",
@@ -224,7 +224,7 @@ window.PORTFOLIO = {
             },
             {
               "image": "baska-tenlere-kal",
-              "title": "Başka Tenlere Kal",
+              "title": "YOLO",
               "caption": "kerem. · 2026"
             },
             {
