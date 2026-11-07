@@ -1,7 +1,7 @@
 // Site content — edited with the editor at /edit. Plain JSON after the "=".
 window.PORTFOLIO = {
   "version": 2,
-  "updated": "2026-11-07T14:39:41.563Z",
+  "updated": "2026-11-07T21:35:01.667Z",
   "profile": {
     "name": "batuarchv",
     "role": "Cover artist & visual designer",
@@ -290,7 +290,7 @@ window.PORTFOLIO = {
             {
               "image": "u/tc3000-cover-idmf4rq.webp",
               "title": "Tape Canavarı 3000",
-              "caption": "Se7en of 34 · 2025"
+              "caption": "Se7en of 34 · 2026"
             }
           ]
         },
