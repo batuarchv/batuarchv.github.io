@@ -1,7 +1,7 @@
 // Site content — edited with the editor at /edit. Plain JSON after the "=".
 window.PORTFOLIO = {
   "version": 2,
-  "updated": "2026-11-06T23:52:07.927Z",
+  "updated": "2026-11-07T14:39:41.563Z",
   "profile": {
     "name": "batuarchv",
     "role": "Cover artist & visual designer",
@@ -67,8 +67,8 @@ window.PORTFOLIO = {
           "section": "Album — full visual identity",
           "title": "80B",
           "subtitle": "sulga & tunedbugra · 2025",
-          "text": "Complete visual identity for the 80B album: cover, logotype, the pink 80B mark, repeat pattern, framed print, sticker sheets, phone wallpapers, single covers (DUR, YALNIZ) and promo photography. Plus the music video for YALNIZ.",
-          "youtube": "BQtHUmRcaS8",
+          "text": "Complete visual identity for the 80B album: cover, logotype, the pink 80B mark, repeat pattern, framed print, sticker sheets, phone wallpapers, single covers (DUR, YALNIZ) and promo photography. Plus the music video for UYUMA.",
+          "youtube": "",
           "tile": {
             "style": "pattern",
             "images": [
@@ -106,10 +106,6 @@ window.PORTFOLIO = {
             {
               "image": "80b-pattern",
               "title": "80B repeat pattern"
-            },
-            {
-              "image": "80b-print",
-              "title": "Framed print"
             },
             {
               "image": "80b-stickers",
@@ -292,8 +288,8 @@ window.PORTFOLIO = {
               "caption": "7even & VONN · 2024"
             },
             {
-              "image": "se7en-of-34",
-              "title": "Se7en of 34",
+              "image": "u/tc3000-cover-idmf4rq.webp",
+              "title": "Tape Canavarı 3000",
               "caption": "Se7en of 34 · 2025"
             }
           ]
