@@ -645,7 +645,7 @@ setInterval(() => {
 
 /* ── channel: zoom from tile → banner → (Start) → inside ── */
 const ch = $('ch'), banner = $('banner'), inside = $('inside'), fade = $('fade'), back = $('chBack'), start = $('chStart');
-let cur = null, fromEl = null, chOpen = false, stage = 'banner';
+let cur = null, fromEl = null, chOpen = false, stage = 'banner', direct = false;
 
 function bannerHTML(c) {
   const b = c.banner || {};
@@ -709,7 +709,7 @@ function setStage(s) {
   if (s === 'inside') {
     inside.innerHTML = insideHTML(cur); inside.scrollTop = 0;
     inside.querySelectorAll('video[data-src]').forEach(v => io.observe(v));
-    back.textContent = 'Back';
+    back.textContent = direct ? 'Wii Menu' : 'Back';
     const btn = cur.button && cur.button.url && cur.button.label;
     start.hidden = !btn; if (btn) { start.textContent = cur.button.label; start.classList.add('c-link'); }
   } else {
@@ -742,7 +742,7 @@ function openCh(id, el, toStage) {
   setStage(toStage || 'banner');
   ch.classList.add('open'); ch.setAttribute('aria-hidden', 'false');
   const r = el && el.getBoundingClientRect && el.getBoundingClientRect();
-  if (r && r.width && !reduce && !toStage) {
+  if (r && r.width && !reduce && (!toStage || direct)) {
     ch.animate([{ transform: rectTransform(r), borderRadius: '40px', opacity: .6 }, { transform: 'none', borderRadius: '0px', opacity: 1 }],
       { duration: 460, easing: 'cubic-bezier(.2,.85,.25,1)' });
   }
@@ -761,7 +761,7 @@ function closeCh(instant) {
       { duration: 380, easing: 'cubic-bezier(.5,0,.75,0)' }).onfinish = finish;
   } else finish();
 }
-back.addEventListener('click', () => stage === 'inside' ? crossfade(() => setStage('banner')) : closeCh());
+back.addEventListener('click', () => stage === 'inside' && !direct ? crossfade(() => setStage('banner')) : closeCh());
 start.addEventListener('click', () => {
   if (stage === 'banner') return crossfade(() => setStage('inside'));
   const u = cur.button && cur.button.url; if (!u) return;
@@ -796,7 +796,8 @@ const byKind = k => { for (const p of D.pages || []) for (const c of p.channels 
 document.addEventListener('click', e => {
   if (swallowClick) return;
   const k = e.target.closest('[data-kind]');
-  if (k && !chOpen) { const id = byKind(k.dataset.kind); if (id) openCh(id, null); return; }
+  if (k && !chOpen) { const id = byKind(k.dataset.kind); if (id) { direct = true; openCh(id, k, 'inside'); } return; }
+  if (e.target.closest('.tile[data-ch]')) direct = false;
   const t = e.target.closest('.tile[data-ch]');
   if (t && !chOpen) {
     e.preventDefault();
@@ -812,14 +813,14 @@ document.addEventListener('keydown', e => {
     return;
   }
   if (chOpen) {
-    if (e.key === 'Escape') { e.preventDefault(); stage === 'inside' ? crossfade(() => setStage('banner')) : closeCh(); }
+    if (e.key === 'Escape') { e.preventDefault(); stage === 'inside' && !direct ? crossfade(() => setStage('banner')) : closeCh(); }
     if ((e.key === 'Enter' || e.key === ' ') && e.target.matches('figure[data-i]')) { e.preventDefault(); openV(cur.items, +e.target.dataset.i); }
     return;
   }
   if (!document.body.classList.contains('booted')) return;
   if (e.key === 'ArrowRight') goPage(page + 1);
   if (e.key === 'ArrowLeft') goPage(page - 1);
-  if ((e.key === 'Enter' || e.key === ' ') && e.target.matches('.tile[data-ch]')) { e.preventDefault(); openCh(e.target.dataset.ch, e.target); }
+  if ((e.key === 'Enter' || e.key === ' ') && e.target.matches('.tile[data-ch]')) { e.preventDefault(); direct = false; openCh(e.target.dataset.ch, e.target); }
 });
 document.addEventListener('visibilitychange', () => document.body.classList.toggle('paused', document.hidden));
 
@@ -909,7 +910,7 @@ window.__site = {
     if (openId && CH[openId]) { const y = inside.scrollTop; openCh(openId, null, st); inside.scrollTop = y; }
     else if (openId) closeCh(true);
   },
-  open(id, st) { const c = CH[id]; if (!c) return; this.page(id); openCh(id, document.querySelector(`.tile[data-ch="${CSS.escape(id)}"]`), st || 'banner'); },
+  open(id, st) { const c = CH[id]; if (!c) return; direct = false; this.page(id); openCh(id, document.querySelector(`.tile[data-ch="${CSS.escape(id)}"]`), st || 'banner'); },
   close() { closeV(); closeCh(true); },
   page(id) { const pi = PAGES.findIndex(l => l.some(c => c.id === id)); if (pi >= 0 && pi !== page) goPage(pi, true); },
   highlight(id) {
