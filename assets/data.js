@@ -1,7 +1,7 @@
 // Site content — edited with the editor at /edit. Plain JSON after the "=".
 window.PORTFOLIO = {
   "version": 2,
-  "updated": "2026-11-07T21:36:10.205Z",
+  "updated": "2026-11-13T09:24:28.198Z",
   "profile": {
     "name": "batuarchv",
     "role": "Cover artist & visual designer",
@@ -136,20 +136,121 @@ window.PORTFOLIO = {
         {
           "id": "ch-9nkik",
           "kind": "gallery",
-          "name": "YOLO",
+          "name": "YOLO Channel",
           "tag": "YOLO - kerem.",
-          "title": "Yeni kanal",
-          "subtitle": "",
-          "text": "",
-          "items": [],
+          "title": "YOLO",
+          "subtitle": "kerem. · 2026",
+          "text": "Complete visual identity for kerem.'s YOLO album: the green-car cover shoot, the brush logotype and type lockups, CD disc, booklet and obi strip print, the release-party poster, a flag and building illustrations. Plus the early concepts it grew out of.",
+          "items": [
+            {
+              "image": "yolo-cover",
+              "title": "YOLO — album cover"
+            },
+            {
+              "image": "yolo-photo",
+              "title": "Promo photo"
+            },
+            {
+              "image": "yolo-car",
+              "title": "Promo photo — wide"
+            },
+            {
+              "image": "yolo-logo",
+              "title": "YOLO logotype"
+            },
+            {
+              "image": "yolo-lockup",
+              "title": "Type lockup"
+            },
+            {
+              "image": "yolo-texture",
+              "title": "Textured lockup"
+            },
+            {
+              "image": "yolo-motion",
+              "title": "Motion lockup"
+            },
+            {
+              "image": "yolo-flag",
+              "title": "YOLO flag"
+            },
+            {
+              "image": "yolo-disc",
+              "title": "CD disc print"
+            },
+            {
+              "image": "yolo-booklet",
+              "title": "CD booklet — back"
+            },
+            {
+              "image": "yolo-obi-tracklist",
+              "title": "Obi strip — tracklist"
+            },
+            {
+              "image": "yolo-obi",
+              "title": "Obi strip — front & back"
+            },
+            {
+              "image": "yolo-poster",
+              "title": "Tuzak Party poster",
+              "caption": "Release party"
+            },
+            {
+              "image": "yolo-building-1",
+              "title": "YOLO building",
+              "caption": "Illustration"
+            },
+            {
+              "image": "yolo-building-2",
+              "title": "YOLO building — day",
+              "caption": "Illustration"
+            },
+            {
+              "image": "yolo-concept-1",
+              "title": "Early logo",
+              "caption": "Concept · 2025"
+            },
+            {
+              "image": "yolo-concept-2",
+              "title": "Early logo — outline",
+              "caption": "Concept · 2025"
+            },
+            {
+              "image": "yolo-concept-3",
+              "title": "YOLO sign",
+              "caption": "Concept · 2025"
+            },
+            {
+              "image": "yolo-concept-4",
+              "title": "Navy & green",
+              "caption": "Concept · 2025"
+            },
+            {
+              "image": "yolo-concept-5",
+              "title": "Fisheye sky",
+              "caption": "Concept · 2025"
+            }
+          ],
           "tile": {
             "style": "slideshow",
-            "images": []
+            "images": [
+              "yolo-cover",
+              "yolo-logo",
+              "yolo-building-2",
+              "yolo-poster",
+              "yolo-booklet"
+            ]
           },
           "banner": {
             "style": "cards",
-            "images": []
-          }
+            "images": [
+              "yolo-cover",
+              "yolo-logo",
+              "yolo-poster"
+            ],
+            "background": "yolo-car"
+          },
+          "section": "Album — full visual identity"
         },
         {
           "id": "covers",
