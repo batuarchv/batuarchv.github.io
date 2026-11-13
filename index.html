@@ -172,7 +172,8 @@ body.booted .tile{opacity:1;animation:tileIn .6s var(--ease) backwards;animation
 .strip img,.banner .bgstrip img{position:absolute;top:0;width:106%;height:100%;object-fit:cover;
   -webkit-mask:linear-gradient(90deg,transparent,#000 5.6%);mask:linear-gradient(90deg,transparent,#000 5.6%)}
 @keyframes strip{to{transform:translateX(-100%)}}
-.t80 .strip img{object-position:50% 100%}
+.strip img.seamless,.banner .bgstrip img.seamless{-webkit-mask:none;mask:none;object-position:0 50%}
+.t80 .strip img.seamless{object-position:0 100%}
 .t80 .card{position:absolute;left:50%;top:48%;width:44%;aspect-ratio:1;translate:-50% -50%;border-radius:8px;overflow:hidden;box-shadow:0 0 0 2px rgba(255,255,255,.9),0 12px 26px rgba(0,0,0,.4);animation:bob 4s ease-in-out infinite}
 @keyframes bob{50%{transform:translateY(-5px)}}
 .tdisc{display:flex;align-items:center;justify-content:center;gap:6%;height:100%;background:radial-gradient(120% 90% at 30% 20%,#fff 0%,#eef7fc 55%,#d9eef9 100%)}
@@ -544,6 +545,13 @@ function imgPath(n, small) {
   return `assets/img/${n}${small ? '-s' : ''}.webp`;
 }
 const I = n => imgPath(n, false), S = n => imgPath(n, true);
+// Images that already repeat horizontally: the source width they repeat at (of their full width).
+// Copies then butt edge to edge with no cross-fade, so the scroll has no hazy seam band.
+const SEAMLESS = { '80b-pattern': 762 / 765 };
+const stripImgs = n => {
+  const r = SEAMLESS[n];
+  return [-1, 0, 1, 2].map(k => `<img src="${S(n)}" alt=""${r ? ' class="seamless"' : ''} style="left:${k * 100}%${r ? `;width:calc(100% / ${r} + 1px)` : ''}">`).join('');
+};
 const V = n => (ED && ED.url('video:' + n)) || `assets/video/${n}`;
 const ytThumb = id => `https://i.ytimg.com/vi/${id}/hqdefault.jpg`;
 const P = () => D.profile || {};
@@ -583,7 +591,7 @@ function tileHTML(c, seed) {
     case 'disc': return `<div class="tdisc">${discHTML('spin')}<div><b>${esc(P().name || 'batuarchv')}</b><small>${esc(c.name || 'Disc Channel')}</small></div></div>`;
     case 'mail': return `<div class="tmail"><div class="env">${envSVG()}<span class="badge">1</span></div></div>`;
     case 'youtube': return c.youtube ? `<div class="tvid" style="position:absolute;inset:0"><div class="kb"><img src="${ytThumb(c.youtube)}" alt="" style="--d:-6s"></div><span class="play"></span></div>` : placeholder(c);
-    case 'pattern': return imgs.length ? `<div class="t80" style="position:absolute;inset:0"><div class="strip">${[-1, 0, 1, 2].map(k => `<img src="${S(imgs[0])}" alt="" style="left:${k * 100}%">`).join('')}</div>${imgs[1] ? `<div class="card"><img src="${S(imgs[1])}" alt=""></div>` : ''}</div>` : placeholder(c);
+    case 'pattern': return imgs.length ? `<div class="t80" style="position:absolute;inset:0"><div class="strip">${stripImgs(imgs[0])}</div>${imgs[1] ? `<div class="card"><img src="${S(imgs[1])}" alt=""></div>` : ''}</div>` : placeholder(c);
     case 'mosaic': return imgs.length ? `<div class="mos">${[0, 1, 2].map(k => rot(chunk(imgs, 3, k).slice(0, 8), seed + k)).join('')}</div>` : placeholder(c);
     case 'app': return imgs.length ? `<div class="tapp">${imgs[1] ? `<img class="bgk" src="${S(imgs[1])}" alt="">` : ''}<img class="ico" src="${S(imgs[0])}" alt=""></div>` : placeholder(c);
     case 'cursors': return `<div class="tcur">${imgs[0] ? kb(imgs[0], t.focus, 2) : ''}<img class="fly" src="assets/cursors/deco-select.png" alt=""><img class="fly b" src="assets/cursors/deco-link.png" alt=""></div>`;
@@ -666,7 +674,7 @@ function bannerHTML(c) {
   const cards = pick(b.images, c).slice(0, 3);
   const bgImg = b.background || cards[0];
   const bg = !bgImg ? '' : b.backgroundStyle === 'scroll'
-    ? `<div class="bgstrip">${[-1, 0, 1, 2].map(k => `<img src="${S(bgImg)}" alt="" style="left:${k * 100}%">`).join('')}</div>`
+    ? `<div class="bgstrip">${stripImgs(bgImg)}</div>`
     : `<div class="bg" style="background-image:url('${S(bgImg)}')"></div>`;
   const side = (n, cls) => n ? `<div class="card ${cls}"><img src="${S(n)}" alt=""></div>` : '';
   return `${bg}<div class="fan">${side(cards[1], 'l')}${side(cards[2], 'r')}${cards[0] ? `<div class="card c"><img src="${I(cards[0])}" alt=""></div>` : ''}</div>${name}`;
