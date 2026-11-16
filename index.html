@@ -15,6 +15,7 @@
 <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;500;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="assets/cursors.css">
 <script>/* Chromium can bend the backdrop through an SVG filter (real glass refraction); others get frosted glass. */
+try { var t = localStorage.getItem('theme'); if (t ? t === 'dark' : matchMedia('(prefers-color-scheme: dark)').matches) document.documentElement.classList.add('dark'); } catch (e) {}
 try { var b = navigator.userAgentData && navigator.userAgentData.brands; if (b && b.some(function (x) { return /Chrom|Edge/.test(x.brand); })) document.documentElement.classList.add('lg'); } catch (e) {}</script>
 <style>
 :root{
@@ -26,9 +27,6 @@ try { var b = navigator.userAgentData && navigator.userAgentData.brands; if (b &
   --mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 220 150'%3E%3Cpath d='M0 60.5H43.74A71 71 0 0 1 176.26 60.5H220V150H0Z'/%3E%3C/svg%3E");
   --plastic:linear-gradient(180deg,#fff 0%,#f6f7f9 46%,#e9ecef 54%,#f3f5f7 100%);
 }
-/* The Wii look is a light theme on purpose; dark mode only deepens the stripes a touch. */
-@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){ --bg:#eceef0; --stripe:#e0e3e6; } }
-:root[data-theme="dark"]{ --bg:#eceef0; --stripe:#e0e3e6; }
 *{box-sizing:border-box;margin:0;padding:0}
 html{min-height:100%;background:
   radial-gradient(120% 55% at 50% -12%,rgba(255,255,255,.95),rgba(255,255,255,0) 62%),
@@ -402,11 +400,111 @@ body.booted .tile{opacity:1;animation:tileIn .6s var(--ease) backwards;animation
   .clock .t{font-size:28px}
   .clock .d{font-size:11px}
 }
+
+/* ───────── warning lander (Wii health & safety screen) ───────── */
+#warn{position:fixed;inset:0;z-index:100;background:#000;color:#fff;display:grid;place-items:center;padding:24px 24px 18vh;outline:0;transition:opacity .7s ease}
+#warn.gone{opacity:0;pointer-events:none}
+.warn-box{width:min(780px,100%);animation:wIn 1.2s ease both}
+.warn-h{display:flex;align-items:center;gap:.45em;font-size:clamp(22px,3.3vw,36px);font-weight:700;letter-spacing:.02em;line-height:1.1}
+.warn-h svg{width:1.1em;height:1.1em;flex:none}
+.warn-box p{margin-top:1.1em;font-size:clamp(15px,1.85vw,21px);line-height:1.65;font-weight:500;color:#fff}
+.warn-cont{position:absolute;left:0;right:0;bottom:12vh;text-align:center;font-size:clamp(16px,2vw,22px);font-weight:500;opacity:0;transition:opacity .9s ease}
+#warn.ready .warn-cont{opacity:1}
+#warn.ready .warn-cont span{animation:wPulse 2.6s ease-in-out 1s infinite}
+.warn-cont .key{display:inline-grid;place-items:center;width:1.55em;height:1.55em;margin:0 .3em;border:2px solid #fff;border-radius:50%;vertical-align:-.3em}
+.warn-cont .key svg{width:58%;height:58%}
+@keyframes wIn{from{opacity:0}}
+@keyframes wPulse{50%{opacity:.45}}
+
+/* ───────── theme switch (bottom bar) ───────── */
+.theme-btn{position:absolute;left:calc(26px * var(--s));top:calc(50% + 5px * var(--s));translate:0 -50%;width:max(34px,calc(52px * var(--s)));aspect-ratio:1;border-radius:50%;pointer-events:auto;display:grid;place-items:center;
+  background:radial-gradient(circle at 50% 118%,#dde2e7 0%,#f3f5f7 40%,#fff 64%);
+  box-shadow:0 0 0 calc(2px * var(--s)) #c3c8cd,inset 0 2px 0 #fff,0 calc(3px * var(--s)) calc(7px * var(--s)) rgba(30,42,60,.2);transition:transform .2s var(--ease),box-shadow .2s}
+.theme-btn:hover,.theme-btn:focus-visible{outline:0;transform:translateY(-2px);box-shadow:0 0 0 calc(2px * var(--s)) #2fb6ea,0 0 0 5px rgba(52,189,239,.22),0 0 18px rgba(52,189,239,.5),inset 0 2px 0 #fff}
+.theme-btn:active{transform:translateY(1px)}
+.theme-btn svg{grid-area:1/1;width:52%;height:52%;fill:none;stroke:#9aa0a6;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;transition:opacity .35s,transform .5s var(--ease),stroke .2s}
+.theme-btn:hover svg{stroke:#1a9ad4}
+.theme-btn .sun{opacity:0;transform:rotate(-90deg) scale(.6)}
+html.dark .theme-btn .sun{opacity:1;transform:none}
+html.dark .theme-btn .moon{opacity:0;transform:rotate(90deg) scale(.6)}
+::view-transition-old(root),::view-transition-new(root){animation-duration:.6s;animation-timing-function:ease}
+.theme-veil{position:fixed;inset:0;z-index:95;opacity:0;pointer-events:none;transition:opacity .28s ease}
+.theme-veil.on{opacity:1}
+@media (max-width:520px){ .theme-btn{left:6px} .clock{left:46px} .clock .t{font-size:24px} }
+
+/* ───────── dark mode ───────── */
+html.dark{--bg:#17191c;--stripe:#1c1f23;--ink:#b4bbc2;--ink-strong:#eef1f4;--muted:#7c848c;
+  --plastic:linear-gradient(180deg,#3b4046 0%,#2f3338 46%,#262a2e 54%,#2c3035 100%);
+  background:radial-gradient(120% 55% at 50% -12%,rgba(90,110,130,.22),rgba(90,110,130,0) 62%),
+    repeating-linear-gradient(180deg,transparent 0 3px,var(--stripe) 3px 4px),linear-gradient(180deg,#1d2024,var(--bg) 42%,#121416)}
+html.dark .ambient i{opacity:.22}
+html.dark .glass{background:linear-gradient(180deg,rgba(52,57,63,.66),rgba(28,31,35,.44));
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.14),inset 0 -1px 0 rgba(255,255,255,.04),0 10px 28px rgba(0,0,0,.4),0 1px 2px rgba(0,0,0,.3)}
+html.dark .glass::before{background:linear-gradient(150deg,rgba(255,255,255,.32),rgba(255,255,255,.06) 36%,rgba(255,255,255,0) 55%,rgba(255,255,255,.16))}
+html.dark .pill{text-shadow:0 1px 0 rgba(0,0,0,.5);box-shadow:0 0 0 2px #4a5057,inset 0 2px 0 rgba(255,255,255,.12),inset 0 -3px 6px rgba(0,0,0,.2),0 4px 0 #111316,0 9px 18px rgba(0,0,0,.4)}
+html.dark .pill::before{background:linear-gradient(rgba(255,255,255,.16),rgba(255,255,255,0))}
+html.dark .pill:hover,html.dark .pill:focus-visible{color:#5fd0f7;box-shadow:0 0 0 2px #2fb6ea,0 0 0 6px rgba(52,189,239,.2),0 0 26px rgba(52,189,239,.4),inset 0 2px 0 rgba(255,255,255,.12),0 4px 0 #0f4f6c,0 9px 18px rgba(0,0,0,.4)}
+html.dark .tile{background:linear-gradient(180deg,#3a3f45 0%,#2b2f34 48%,#202327 100%);
+  box-shadow:0 0 0 1px #0b0c0e,inset 0 1px 0 rgba(255,255,255,.12),inset 0 -2px 3px rgba(0,0,0,.25),0 3px 8px rgba(0,0,0,.35),0 1px 1px rgba(0,0,0,.3)}
+html.dark .tile .view{background:#1a1c1f}
+html.dark .tile:not(.empty):hover,html.dark .tile:focus-visible,html.dark .tile.sel{background:linear-gradient(180deg,#3d4f5c 0%,#1f4b63 46%,#16698f 100%);
+  box-shadow:0 0 0 1.5px #2fb6ea,inset 0 1px 0 rgba(255,255,255,.2),0 0 0 6px rgba(52,189,239,.18),0 0 30px rgba(52,189,239,.4),0 12px 24px rgba(0,0,0,.45)}
+html.dark .tile.empty{background:linear-gradient(180deg,#2a2d31,#1f2225)}
+html.dark .tile.empty .view{background:repeating-linear-gradient(180deg,#1e2124 0 3px,#191b1e 3px 4px)}
+html.dark .tile .ph{color:#5b6268;background:repeating-linear-gradient(135deg,#202326 0 10px,#1b1d20 10px 20px)}
+html.dark .tag{color:#eef1f4;background:linear-gradient(180deg,rgba(44,48,54,.92),rgba(30,33,37,.7));box-shadow:inset 0 1px 0 rgba(255,255,255,.14),inset 0 0 0 1px rgba(255,255,255,.06),0 2px 6px rgba(0,0,0,.4)}
+html.dark .dots button{background:radial-gradient(circle at 38% 30%,#555b62,#2a2e33 72%);box-shadow:inset 0 -1px 2px rgba(0,0,0,.4),0 1px 1px rgba(0,0,0,.3)}
+html.dark .dots button.on{background:radial-gradient(circle at 38% 30%,#dff7ff,#34bdef 55%,#168fc9)}
+html.dark .arrow .gel{stroke:#2a2e33}
+html.dark .bar-glass{background:linear-gradient(180deg,rgba(40,44,49,.62) 0%,rgba(30,33,37,.78) 46%,rgba(22,24,27,.9) 100%)}
+html.dark .bar::after{background:rgba(22,24,27,.9)}
+html.dark #sockG stop:nth-child(1){stop-color:#0e1012}html.dark #sockG stop:nth-child(2){stop-color:#1b1e21}html.dark #sockG stop:nth-child(3){stop-color:#25282c}
+html.dark .bar .side path:nth-of-type(1){stroke:#0b0c0e}
+html.dark .bar .side path:nth-of-type(2){stroke:rgba(255,255,255,.12)}
+html.dark .bar .mid::before{background:linear-gradient(180deg,#0b0c0e 0 calc(2px * var(--s)),rgba(255,255,255,.12) calc(2px * var(--s)) calc(3.5px * var(--s)),transparent calc(3.5px * var(--s)) calc(7px * var(--s)),#34bdef calc(7px * var(--s)) calc(9px * var(--s)),transparent calc(9px * var(--s))),linear-gradient(180deg,transparent calc(5.5px * var(--s)),rgba(52,189,239,.18) calc(5.5px * var(--s)) calc(10.5px * var(--s)),transparent calc(10.5px * var(--s)))}
+html.dark .round,html.dark .theme-btn{background:radial-gradient(circle at 50% 118%,#15171a 0%,#272a2f 40%,#3a3f45 70%)}
+html.dark .round{box-shadow:0 0 0 calc(2px * var(--s)) #4a5057,inset 0 calc(-5px * var(--s)) calc(10px * var(--s)) rgba(0,0,0,.3),inset 0 2px 0 rgba(255,255,255,.14),0 calc(5px * var(--s)) calc(10px * var(--s)) rgba(0,0,0,.45)}
+html.dark .theme-btn{box-shadow:0 0 0 calc(2px * var(--s)) #4a5057,inset 0 2px 0 rgba(255,255,255,.14),0 calc(3px * var(--s)) calc(7px * var(--s)) rgba(0,0,0,.45)}
+html.dark .round::before{background:linear-gradient(180deg,rgba(255,255,255,.2),rgba(255,255,255,.02))}
+html.dark .round:hover,html.dark .round:focus-visible,html.dark .theme-btn:hover,html.dark .theme-btn:focus-visible{box-shadow:0 0 0 calc(2px * var(--s)) #2fb6ea,0 0 0 calc(6px * var(--s)) rgba(52,189,239,.2),0 0 calc(26px * var(--s)) rgba(52,189,239,.45),inset 0 2px 0 rgba(255,255,255,.14)}
+html.dark .round.mail svg,html.dark .theme-btn svg{stroke:#a3abb3}
+html.dark .round img{filter:invert(1) hue-rotate(180deg) brightness(1.05)}
+html.dark .clock .t{color:#7d858d;text-shadow:0 1px 0 rgba(0,0,0,.6)}
+html.dark .clock .d{color:#666e76;text-shadow:none}
+html.dark #ch{background:#111214}
+html.dark .inside{background:radial-gradient(120% 55% at 50% -12%,rgba(90,110,130,.22),rgba(90,110,130,0) 62%),repeating-linear-gradient(180deg,transparent 0 3px,var(--stripe) 3px 4px),linear-gradient(180deg,#1d2024,var(--bg) 42%,#121416)}
+html.dark .fade{background:#111214}
+html.dark .banner.light{background:radial-gradient(120% 90% at 50% 20%,#2c3238 0%,#1d2329 50%,#13181d 100%)}
+html.dark .banner.light .name b{color:#eef1f4;text-shadow:none;background:linear-gradient(180deg,rgba(60,66,73,.9),rgba(36,40,45,.6))}
+html.dark .banner.light .name small{text-shadow:none}
+html.dark #ch .foot{background:linear-gradient(180deg,rgba(36,40,45,.6),rgba(20,22,25,.82))}
+html.dark #ch .foot::after{background:linear-gradient(180deg,#0b0c0e 0 2px,rgba(255,255,255,.12) 2px 3.5px,transparent 3.5px 7px,#34bdef 7px 9px,transparent 9px)}
+html.dark .head h2{text-shadow:none}
+html.dark .gal figure{background:linear-gradient(180deg,#2c3035,#222529);box-shadow:0 0 0 1px rgba(0,0,0,.5),inset 0 1px 0 rgba(255,255,255,.08),0 8px 18px rgba(0,0,0,.35)}
+html.dark .gal figure:hover,html.dark .gal figure:focus-visible{box-shadow:0 0 0 1.5px #2fb6ea,0 0 0 6px rgba(52,189,239,.16),0 0 24px rgba(52,189,239,.3),0 14px 28px rgba(0,0,0,.45)}
+html.dark .gal .m{background:#1a1c1f}
+html.dark .yt{background:linear-gradient(180deg,#33373c,#222529);box-shadow:0 0 0 1px #0b0c0e,inset 0 1px 0 rgba(255,255,255,.1),0 14px 30px rgba(0,0,0,.4)}
+html.dark .list a{text-shadow:none;box-shadow:0 0 0 1.5px #464c52,inset 0 2px 0 rgba(255,255,255,.1),0 3px 0 #111316,0 6px 14px rgba(0,0,0,.35)}
+html.dark .chips span{background:linear-gradient(180deg,rgba(48,54,60,.95),rgba(30,40,48,.9));box-shadow:0 0 0 1px rgba(52,189,239,.35),inset 0 1px 0 rgba(255,255,255,.08)}
+html.dark #viewer{background:rgba(12,13,15,.66)}
+html.dark #viewer .media{background:#111;box-shadow:0 0 0 5px #2a2e33,0 0 0 6px rgba(0,0,0,.5),0 26px 60px rgba(0,0,0,.6)}
+html.dark #viewer .cap{text-shadow:none}
+@media (prefers-reduced-transparency:reduce){html.dark .glass,html.dark .bar-glass,html.dark .tag,html.dark #viewer{background:#202327!important}}
 @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}.tile{opacity:1}}
 </style>
 </head>
 <body>
 <div class="ambient" aria-hidden="true"><i></i><i></i><i></i></div>
+
+<!-- ═════════════ WARNING LANDER ═════════════ -->
+<div id="warn" role="dialog" aria-modal="true" aria-labelledby="warnH" tabindex="-1">
+  <div class="warn-box">
+    <h2 class="warn-h" id="warnH"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.6 1.6 21h20.8Z" fill="none" stroke="#fff" stroke-width="2" stroke-linejoin="round"/><path d="M12 9.2v6" stroke="#fff" stroke-width="2.2" stroke-linecap="round"/><circle cx="12" cy="18" r="1.25" fill="#fff"/></svg>WARNING – DEMO VERSION</h2>
+    <p>This portfolio site is still in demo. Some channels, images and features are unfinished, and things may move, change or break without notice.</p>
+    <p>Everything here is a work in progress. Thanks for stopping by early.</p>
+  </div>
+  <div class="warn-cont" aria-live="polite"><span>Press<i class="key" aria-label="Return"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 5v7a3 3 0 0 1-3 3H6"/><path d="m10 10-5 5 5 5"/></svg></i>to continue.</span></div>
+</div>
 
 <svg class="defs" aria-hidden="true" focusable="false">
   <defs>
@@ -489,6 +587,10 @@ body.booted .tile{opacity:1;animation:tileIn .6s var(--ease) backwards;animation
     <button class="round" data-kind="about" aria-label="About batuarchv"><img src="assets/img/logo-face.png" alt=""></button>
   </div>
   <div class="mid">
+    <button class="theme-btn" id="themeBtn" aria-label="Switch to dark mode">
+      <svg class="moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5Z"/></svg>
+      <svg class="sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.5v2.2M12 19.3v2.2M2.5 12h2.2M19.3 12h2.2M5.3 5.3l1.55 1.55M17.15 17.15l1.55 1.55M5.3 18.7l1.55-1.55M17.15 6.85l1.55-1.55"/></svg>
+    </button>
     <div class="clock"><div class="t" id="time">--<i>:</i>--</div><div class="d" id="date"></div></div>
   </div>
   <div class="side r">
@@ -870,9 +972,33 @@ function insert(dx = 0, dy = 0) {
   }, 880);
   a.onfinish = () => setTimeout(() => reveal(false), 650);
 }
+/* ── warning lander: black screen, then "Press ⏎ to continue." after a second ── */
+let warn = $('warn'); const afterWarn = [];
+const whenWarned = fn => warn ? afterWarn.push(fn) : fn();
+{
+  let seen = !!ED; try { seen = seen || sessionStorage.getItem('warned') === '1'; } catch (_) {}
+  if (seen) { warn.remove(); warn = null; }
+  else {
+    let ready = false;
+    warn.focus({ preventScroll: true });
+    setTimeout(() => { ready = true; warn.classList.add('ready'); }, 1000);
+    const go = () => {
+      if (!ready || !warn) return;
+      try { sessionStorage.setItem('warned', '1'); } catch (_) {}
+      const w = warn; warn = null;
+      document.removeEventListener('keydown', onKey, true);
+      w.classList.add('gone'); setTimeout(() => w.remove(), 750);
+      setTimeout(() => afterWarn.splice(0).forEach(fn => fn()), 250);
+    };
+    const onKey = e => { e.stopPropagation(); if (['Enter', ' ', 'Escape'].includes(e.key)) { e.preventDefault(); go(); } };
+    warn.addEventListener('click', go);
+    document.addEventListener('keydown', onKey, true);
+  }
+}
+
 const INTRO = false;   // the disc-into-console intro; off for now
 let skip = !!ED || !INTRO; try { skip = skip || sessionStorage.getItem('booted') === '1'; } catch (_) {}
-if (skip || reduce) reveal(true);
+if (skip || reduce) whenWarned(() => reveal(true));
 $('skip').onclick = () => reveal(true);
 
 let drag = null;
@@ -914,6 +1040,25 @@ function clock() {
   setTimeout(clock, (60 - d.getSeconds()) * 1000 + 50);
 }
 clock();
+
+/* ── light / dark switch in the bottom bar, cross-faded ── */
+const themeBtn = $('themeBtn'), root = document.documentElement;
+const setTheme = dark => {
+  root.classList.toggle('dark', dark);
+  themeBtn.setAttribute('aria-label', dark ? 'Switch to light mode' : 'Switch to dark mode');
+  const m = document.querySelector('meta[name="theme-color"]'); if (m) m.content = dark ? '#17191c' : '#f3f4f6';
+};
+setTheme(root.classList.contains('dark'));
+themeBtn.onclick = () => {
+  const dark = !root.classList.contains('dark');
+  try { localStorage.setItem('theme', dark ? 'dark' : 'light'); } catch (_) {}
+  if (reduce) return setTheme(dark);
+  if (document.startViewTransition) return document.startViewTransition(() => setTheme(dark));
+  const veil = document.createElement('div'); veil.className = 'theme-veil'; veil.style.background = dark ? '#17191c' : '#f3f4f6';
+  document.body.appendChild(veil);
+  requestAnimationFrame(() => requestAnimationFrame(() => veil.classList.add('on')));
+  setTimeout(() => { setTheme(dark); veil.classList.remove('on'); setTimeout(() => veil.remove(), 320); }, 300);
+};
 
 /* ── API for the editor's live preview ── */
 window.__site = {
