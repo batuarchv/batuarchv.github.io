@@ -272,7 +272,7 @@ const API = (() => {
 })();
 const ASSET = '../assets/';
 const MAX_VIDEO_MB = 25, MAX_PER_PAGE = 12;   // GitHub drops very large single uploads, so videos stay small
-const EDITOR_VERSION = 6;   // bump together with edit/version.json when the editor changes
+const EDITOR_VERSION = 7;   // bump together with edit/version.json when the editor changes
 
 /* ════════════════════════════ tiny helpers ════════════════════════════ */
 const $ = id => document.getElementById(id);
@@ -1043,7 +1043,14 @@ async function editorIsCurrent() {
 }
 
 /* ════════════════════════════ publish ════════════════════════════ */
+// one publish at a time: a double click / click+Enter used to start two runs racing each other
+let publishing = false;
 async function publish() {
+  if (publishing) return;
+  publishing = true;
+  try { await publishOnce(); } finally { publishing = false; }
+}
+async function publishOnce() {
   if (!(await editorIsCurrent())) return;
   if (!isDirty()) return toast('Yayınlanacak bir değişiklik yok ✓', 'ok');
   if (!tokenStore.get()) { const ok = await connectModal(); if (!ok) return; }
@@ -1089,7 +1096,13 @@ async function publish() {
       for (let attempt = 0; attempt < 3 && !blob; attempt++) {
         if (attempt) { step(`Tekrar deneniyor (${attempt + 1}/3): ${name}`); await new Promise(r => setTimeout(r, 1500 * attempt)); }
         try { blob = await gh(repoPath('/git/blobs'), { method: 'POST', body }); }
-        catch (e) { lastErr = e; if (!(e.status === 0 || e.status >= 500 || e.rate)) break; }
+        catch (e) {
+          lastErr = e;
+          // GitHub now and then answers one request in a burst with 401 although the key is fine:
+          // ask again with the same key; only a key that really stopped working ends the publish
+          if (e.status === 401) { try { await gh(repoPath('')); continue; } catch (_) { break; } }
+          if (!(e.status === 0 || e.status >= 500 || e.rate)) break;
+        }
       }
       if (!blob) { lastErr.file = name; lastErr.size = f.blob.size; throw lastErr; }
       tree.push({ path: f.path, mode: '100644', type: 'blob', sha: blob.sha }); tickBar();
