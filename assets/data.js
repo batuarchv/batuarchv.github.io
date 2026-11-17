@@ -1,7 +1,7 @@
 // Site content — edited with the editor at /edit. Plain JSON after the "=".
 window.PORTFOLIO = {
   "version": 2,
-  "updated": "2026-11-13T09:24:28.198Z",
+  "updated": "2026-11-17T08:12:49.730Z",
   "profile": {
     "name": "batuarchv",
     "role": "Cover artist & visual designer",
@@ -196,16 +196,6 @@ window.PORTFOLIO = {
               "caption": "Release party"
             },
             {
-              "image": "yolo-building-1",
-              "title": "YOLO building",
-              "caption": "Illustration"
-            },
-            {
-              "image": "yolo-building-2",
-              "title": "YOLO building — day",
-              "caption": "Illustration"
-            },
-            {
               "image": "yolo-concept-1",
               "title": "Early logo",
               "caption": "Concept · 2025"
@@ -234,19 +224,13 @@ window.PORTFOLIO = {
           "tile": {
             "style": "slideshow",
             "images": [
-              "yolo-cover",
-              "yolo-logo",
-              "yolo-building-2",
-              "yolo-poster",
-              "yolo-booklet"
+              "yolo-cover"
             ]
           },
           "banner": {
             "style": "cards",
             "images": [
-              "yolo-cover",
-              "yolo-logo",
-              "yolo-poster"
+              "yolo-cover"
             ],
             "background": "yolo-car"
           },
@@ -257,8 +241,8 @@ window.PORTFOLIO = {
           "kind": "gallery",
           "name": "Covers Channel",
           "tag": "Covers",
-          "title": "Covers",
-          "subtitle": "24 releases",
+          "title": "Artworks",
+          "subtitle": "30+ releases and more",
           "text": "Single, EP and album artwork.",
           "button": {
             "label": "Genius credits",
@@ -274,14 +258,14 @@ window.PORTFOLIO = {
           },
           "items": [
             {
+              "image": "hemensimdigel",
+              "title": "#hemensimdigel",
+              "caption": "sulga & VONN · 2024"
+            },
+            {
               "image": "pvrty",
               "title": "PVRTY",
               "caption": "Shawnigan · 2025"
-            },
-            {
-              "image": "sagoba",
-              "title": "SAGOBA",
-              "caption": "Godelieve & Attack_un · 2025"
             },
             {
               "image": "dur",
@@ -289,19 +273,9 @@ window.PORTFOLIO = {
               "caption": "sulga · 2024"
             },
             {
-              "image": "yalniz",
-              "title": "YALNIZ",
-              "caption": "sulga & ocean · 2025"
-            },
-            {
-              "image": "80b-cover",
-              "title": "80B",
-              "caption": "sulga & tunedbugra · 2025"
-            },
-            {
-              "image": "hemensimdigel",
-              "title": "#hemensimdigel",
-              "caption": "sulga & VONN · 2024"
+              "image": "nasil-inanirim",
+              "title": "Nasıl İnanırım",
+              "caption": "kerem. & kum · 2026"
             },
             {
               "image": "maalemusik",
@@ -309,24 +283,29 @@ window.PORTFOLIO = {
               "caption": "VONN · 2025"
             },
             {
+              "image": "baska-tenlere-kal",
+              "title": "YOLO",
+              "caption": "kerem. · 2026"
+            },
+            {
               "image": "tdp",
               "title": "TDP",
               "caption": "VONN · 2025"
             },
             {
-              "image": "vaaz-remix",
-              "title": "Vaaz (Remix)",
-              "caption": "VONN, 7even & Shao · 2026"
+              "image": "u/vonn-ayip-cover-br8vu7n.webp",
+              "title": "AYIP",
+              "caption": "VONN · 2026"
             },
             {
-              "image": "nasil-inanirim",
-              "title": "Nasıl İnanırım",
-              "caption": "kerem. & kum · 2026"
+              "image": "80b-cover",
+              "title": "80B",
+              "caption": "sulga & tunedbugra · 2025"
             },
             {
-              "image": "baska-tenlere-kal",
-              "title": "YOLO",
-              "caption": "kerem. · 2026"
+              "image": "yalniz",
+              "title": "YALNIZ",
+              "caption": "sulga & ocean · 2025"
             },
             {
               "image": "denedim",
@@ -334,14 +313,39 @@ window.PORTFOLIO = {
               "caption": "kerem. & sulga · 2025"
             },
             {
+              "image": "u/tc3000-cover-idmf4rq.webp",
+              "title": "Tape Canavarı 3000",
+              "caption": "Se7en of 34 · 2026"
+            },
+            {
               "image": "film-gibi",
               "title": "film gibi akıyor zaman",
               "caption": "kerem. · 2025"
             },
             {
+              "image": "u/kbhcover-bphfua6.webp",
+              "title": "kalp birdir hep",
+              "caption": "kerem. · 2026"
+            },
+            {
               "image": "astigmat",
               "title": "Astigmat",
               "caption": "kerem. & lotusx · 2025"
+            },
+            {
+              "image": "sagoba",
+              "title": "SAGOBA",
+              "caption": "Godelieve & Attack_un · 2025"
+            },
+            {
+              "image": "u/nobadvibez-brtwcyj.webp",
+              "title": "nobadvibez",
+              "caption": "BEBO · 2026"
+            },
+            {
+              "image": "u/bxrkeerg-bulg43d.webp",
+              "title": "Hackney President",
+              "caption": "bxrke · 2026"
             },
             {
               "image": "annem-derdi",
@@ -359,6 +363,11 @@ window.PORTFOLIO = {
               "caption": "BEBO & sulga · 2025"
             },
             {
+              "image": "vaaz-remix",
+              "title": "Vaaz (Remix)",
+              "caption": "VONN, 7even & Shao · 2026"
+            },
+            {
               "image": "ugrunda",
               "title": "UĞRUNDA",
               "caption": "ocean & tunedbugra · 2025"
@@ -369,14 +378,19 @@ window.PORTFOLIO = {
               "caption": "ocean · 2025"
             },
             {
-              "image": "dram",
-              "title": "DRAM",
-              "caption": "Kidkubi · 2025"
-            },
-            {
               "image": "bilsen",
               "title": "BİLSEN",
               "caption": "kagan & JR · 2025"
+            },
+            {
+              "image": "u/shaneplast-bznlyvo.webp",
+              "title": "yeni yaşlar",
+              "caption": "Shane-p · 2026"
+            },
+            {
+              "image": "dram",
+              "title": "DRAM",
+              "caption": "Kidkubi · 2025"
             },
             {
               "image": "harikalar-diyari",
@@ -387,11 +401,6 @@ window.PORTFOLIO = {
               "image": "duman-al",
               "title": "Duman Al",
               "caption": "7even & VONN · 2024"
-            },
-            {
-              "image": "u/tc3000-cover-idmf4rq.webp",
-              "title": "Tape Canavarı 3000",
-              "caption": "Se7en of 34 · 2026"
             }
           ]
         },
@@ -455,7 +464,7 @@ window.PORTFOLIO = {
             "url": "https://www.instagram.com/reel/DfaJxRJsdcm/"
           },
           "tile": {
-            "style": "slideshow",
+            "style": "mosaic",
             "images": [
               "crashout"
             ],
@@ -464,13 +473,24 @@ window.PORTFOLIO = {
           "banner": {
             "style": "cards",
             "images": [
-              "crashout"
+              "u/ttdrop-film2-full-0qbb4kn.webp"
             ]
           },
           "items": [
             {
-              "image": "crashout",
-              "title": "Crash//Out"
+              "image": "u/ttdrop-film2-full-0qbb4kn.webp",
+              "title": "Crash//Out Promo 1",
+              "video": "u/ttdrop-film2-full-0qaqm.mp4"
+            },
+            {
+              "image": "u/tt-heist-2-147qfth.webp",
+              "title": "Crash//Out Promo 2",
+              "video": "u/tt-heist-2-146tm.mp4"
+            },
+            {
+              "image": "u/trafik-teeter-loop-15w10i0.webp",
+              "title": "Crash//Out Promo Loop",
+              "video": "u/trafik-teeter-loop-15vgl.mp4"
             }
           ]
         },
