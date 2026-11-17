@@ -207,7 +207,9 @@ const wait = ms => new Promise(r => setTimeout(r, ms));
 function errText(e) {
   if (e.status === 401 || e.status === 403) return 'GoatCounter didn’t accept the key. Make sure it has “Read statistics” and was copied completely.';
   if (e.status === 429) return 'GoatCounter is rate-limiting requests — wait a few seconds and press Refresh.';
-  if (!e.status) return 'Couldn’t reach GoatCounter. Check your connection and press Refresh.';
+  // a request that never got an answer: offline, or (most often) a tracker/ad blocker stopping calls to goatcounter.com
+  if (!e.status) return navigator.onLine === false ? 'You’re offline. Reconnect and press Refresh.'
+    : 'Your browser blocked the request to GoatCounter — usually a built-in tracker or ad blocker. Open this page in Safari or Chrome, or allow goatcounter.com on batuarchv.github.io in your blocker.';
   return 'GoatCounter answered with an error (' + e.status + '). Try Refresh in a moment.';
 }
 
