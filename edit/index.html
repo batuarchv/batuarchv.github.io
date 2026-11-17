@@ -272,7 +272,7 @@ const API = (() => {
 })();
 const ASSET = '../assets/';
 const MAX_VIDEO_MB = 40, MAX_PER_PAGE = 12;
-const EDITOR_VERSION = 4;   // bump together with edit/version.json when the editor changes
+const EDITOR_VERSION = 5;   // bump together with edit/version.json when the editor changes
 
 /* ════════════════════════════ tiny helpers ════════════════════════════ */
 const $ = id => document.getElementById(id);
@@ -306,6 +306,7 @@ let repoImages = null;         // list of image names in the repo (when connecte
 /* token: kept in this browser only */
 const tokenStore = {
   get() { try { return sessionStorage.getItem('gh-token') || localStorage.getItem('gh-token') || ''; } catch (_) { return ''; } },
+  remembered() { try { return !!localStorage.getItem('gh-token'); } catch (_) { return false; } },
   set(t, remember) { try { sessionStorage.setItem('gh-token', t); if (remember) localStorage.setItem('gh-token', t); else localStorage.removeItem('gh-token'); } catch (_) {} },
   clear() { try { sessionStorage.removeItem('gh-token'); localStorage.removeItem('gh-token'); } catch (_) {} },
 };
@@ -330,13 +331,16 @@ const saveDraft = debounce(() => idb.set('draft', { data, publishedSnap, baseSha
 /* ════════════════════════════ GitHub ════════════════════════════ */
 async function gh(path, opts = {}) {
   const token = tokenStore.get();
-  const r = await fetch(API + path, {
+  let r;
+  try { r = await fetch(API + path, {
     ...opts,
     headers: { Accept: 'application/vnd.github+json', 'X-GitHub-Api-Version': '2022-11-28', ...(token ? { Authorization: 'Bearer ' + token } : {}), ...(opts.body ? { 'Content-Type': 'application/json' } : {}) },
-  });
+  }); } catch (_) { const e = new Error('network'); e.status = 0; throw e; }
   if (!r.ok) {
     let msg = ''; try { msg = (await r.json()).message || ''; } catch (_) {}
-    const e = new Error(msg || ('HTTP ' + r.status)); e.status = r.status; throw e;
+    const e = new Error(msg || ('HTTP ' + r.status)); e.status = r.status;
+    if ((r.status === 403 || r.status === 429) && (r.headers.get('x-ratelimit-remaining') === '0' || /rate limit/i.test(msg))) e.rate = true;
+    throw e;
   }
   return r.status === 204 ? null : r.json();
 }
@@ -345,15 +349,19 @@ const b64ToText = s => new TextDecoder().decode(Uint8Array.from(atob(s.replace(/
 const blobToB64 = b => new Promise((res, rej) => { const r = new FileReader(); r.onload = () => res(String(r.result).split(',')[1]); r.onerror = rej; r.readAsDataURL(b); });
 const parseDataJs = t => JSON.parse(t.slice(t.indexOf('{'), t.lastIndexOf('}') + 1));
 function ghError(e) {
-  if (e.status === 401) return 'GitHub anahtarı geçersiz ya da süresi dolmuş. Ayarlar’dan yeniden bağlan.';
-  if (e.status === 403) return 'Anahtarın bu repoya yazma izni yok. Token’da “Contents: Read and write” seçili olmalı.';
-  if (e.status === 404) return 'Repo bulunamadı ya da anahtar bu repoyu göremiyor (token’da repo seçili mi?).';
-  if (e.status === 409 || e.status === 422) return 'Sitede aynı anda başka bir değişiklik oldu. Tekrar “Yayınla”ya bas.';
+  const gh = e.message && e.message !== 'network' && !/^HTTP \d+$/.test(e.message) ? ` (GitHub: “${e.message}”)` : '';
+  if (e.status === 0) return 'İnternete ya da GitHub’a ulaşılamadı. Bağlantını kontrol edip tekrar dene — anahtarın silinmedi.';
+  if (e.rate) return 'GitHub şu an çok fazla istek aldığını söylüyor. Birkaç dakika sonra tekrar dene — anahtarın silinmedi.';
+  if (e.status === 401) return 'GitHub anahtarı geçersiz ya da süresi dolmuş. Yeni bir anahtar oluşturup tekrar bağlan.' + gh;
+  if (e.status === 403) return 'Anahtarın bu repoya yazma izni yok: token’da repo olarak “' + REPO + '” ve “Contents: Read and write” seçili olmalı.' + gh;
+  if (e.status === 404) return 'Repo bulunamadı ya da anahtar bu repoyu göremiyor: token oluştururken “Only select repositories”den “' + REPO + '”yu seçtin mi?' + gh;
+  if (e.status === 409 || e.status === 422) return 'Sitede aynı anda başka bir değişiklik oldu. Tekrar “Yayınla”ya bas.' + gh;
+  if (e.status >= 500) return 'GitHub geçici bir hata verdi (' + e.status + '). Biraz sonra tekrar dene — anahtarın silinmedi.';
   return 'Bağlantı hatası: ' + (e.message || 'bilinmiyor');
 }
 
-async function loadRemote() {
-  if (tokenStore.get()) {
+async function loadRemote(viaPublic = false) {
+  if (!viaPublic && tokenStore.get()) {
     const j = await gh(repoPath(`/contents/assets/data.js?ref=${BRANCH}`));
     return { data: parseDataJs(b64ToText(j.content)), sha: j.sha };
   }
@@ -934,16 +942,17 @@ function connectModal() {
   $('sheet').onclick = async e => {
     if (e.target.closest('[data-x]')) return modalClose(false);
     if (!e.target.closest('#tokOk')) return;
-    const t = $('tok').value.trim(); if (!t) { $('tokErr').textContent = 'Önce token’ı yapıştır.'; return; }
+    const t = $('tok').value.replace(/\s+/g, ''); if (!t) { $('tokErr').textContent = 'Önce token’ı yapıştır.'; return; }
+    if (!/^(github_pat_|ghp_)[A-Za-z0-9_]{20,}$/.test(t)) { $('tokErr').textContent = 'Bu bir GitHub anahtarına benzemiyor: “github_pat_” ile başlamalı. Kodun tamamını kopyaladığından emin ol.'; return; }
     $('tokOk').disabled = true; $('tokErr').textContent = '';
-    const prev = tokenStore.get(); tokenStore.set(t, $('remember').checked);
+    const prev = tokenStore.get(), prevRemembered = tokenStore.remembered(); tokenStore.set(t, $('remember').checked);
     try {
       const repo = await gh(repoPath(''));
       if (repo.permissions && repo.permissions.push === false) throw Object.assign(new Error('no push'), { status: 403 });
       await syncAfterConnect();
       modalClose(true); toast('GitHub’a bağlandı ✓', 'ok');
     } catch (err) {
-      if (prev) tokenStore.set(prev, true); else tokenStore.clear();
+      if (prev) tokenStore.set(prev, prevRemembered); else tokenStore.clear();
       $('tokErr').textContent = ghError(err); $('tokOk').disabled = false;
     }
   };
@@ -1096,7 +1105,16 @@ async function publish() {
   } catch (err) {
     console.error(err);
     if ($('perr')) $('perr').textContent = ghError(err);
-    if ($('pfoot')) { $('pfoot').innerHTML = `<button class="btn" data-x="1">Kapat</button>`; $('sheet').onclick = e => { if (e.target.closest('[data-x]')) modalClose(null); }; }
+    const relink = err.status === 401 || err.status === 403 || err.status === 404;
+    if (err.status === 401) tokenStore.clear();   // a rejected key is useless; anything else keeps it
+    if ($('pfoot')) {
+      $('pfoot').innerHTML = `<button class="btn" data-x="1">Kapat</button>${relink ? '<button class="btn primary" id="relink">Yeni anahtarla bağlan</button>' : '<button class="btn primary" id="retry">Tekrar dene</button>'}`;
+      $('sheet').onclick = async e => {
+        if (e.target.closest('[data-x]')) return modalClose(null);
+        if (e.target.closest('#retry')) { modalClose(null); return publish(); }
+        if (e.target.closest('#relink')) { modalClose(null); tokenStore.clear(); if (await connectModal()) publish(); }
+      };
+    }
     updateStatus();
   }
 }
@@ -1132,7 +1150,12 @@ async function init() {
   modeHint();
   editorIsCurrent();
   let remote = null;
-  try { remote = await loadRemote(); } catch (e) { toast(ghError(e), 'bad', 6000); try { tokenStore.clear(); remote = await loadRemote(); } catch (_) {} }
+  try { remote = await loadRemote(); }
+  catch (e) {
+    if (e.status === 401) { tokenStore.clear(); toast('GitHub anahtarının süresi dolmuş ya da iptal edilmiş. “Yayınla”ya basınca yenisini isteyeceğim.', 'bad', 7000); }
+    else toast(ghError(e), 'bad', 7000);
+    try { remote = await loadRemote(true); } catch (_) {}
+  }
   const draft = await idb.get('draft');
   if (draft && draft.data && draft.data.pages) {
     data = draft.data; publishedSnap = draft.publishedSnap || ''; baseSha = draft.baseSha || null;
