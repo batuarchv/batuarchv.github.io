@@ -1,7 +1,7 @@
 // Site content — edited with the editor at /edit. Plain JSON after the "=".
 window.PORTFOLIO = {
   "version": 2,
-  "updated": "2026-11-17T08:12:49.730Z",
+  "updated": "2026-11-17T09:03:05.264Z",
   "profile": {
     "name": "batuarchv",
     "role": "Cover artist & visual designer",
@@ -401,6 +401,61 @@ window.PORTFOLIO = {
               "image": "duman-al",
               "title": "Duman Al",
               "caption": "7even & VONN · 2024"
+            },
+            {
+              "image": "atabeau-take-your-time",
+              "title": "Take Your Time",
+              "caption": "ata-beau · 2026"
+            },
+            {
+              "image": "atabeau-kick-back",
+              "title": "Kick Back",
+              "caption": "ata-beau · 2026"
+            },
+            {
+              "image": "atabeau-see-it-through",
+              "title": "see it through",
+              "caption": "ata-beau · 2026"
+            },
+            {
+              "image": "atabeau-dont-go",
+              "title": "don't go",
+              "caption": "ata-beau · 2025"
+            },
+            {
+              "image": "atabeau-the-way-she-kiss",
+              "title": "the way she kiss",
+              "caption": "ata-beau · 2025"
+            },
+            {
+              "image": "atabeau-liminal-space",
+              "title": "Selected Liminal Space Works",
+              "caption": "ata-beau · EP · 2024"
+            },
+            {
+              "image": "atabeau-lose-you",
+              "title": "Lose You",
+              "caption": "ata-beau · 2024"
+            },
+            {
+              "image": "atabeau-8-23",
+              "title": "8.23",
+              "caption": "ata-beau · 2024"
+            },
+            {
+              "image": "atabeau-hold-rest",
+              "title": "Hold/Rest",
+              "caption": "ata-beau · 2024"
+            },
+            {
+              "image": "atabeau-i-wont-hurt-you",
+              "title": "I Won't Hurt You (Myself) Again",
+              "caption": "ata-beau · 2024"
+            },
+            {
+              "image": "atabeau-but-4-you",
+              "title": "but 4 you",
+              "caption": "ata-beau & H8US · 2023"
             }
           ]
         },
