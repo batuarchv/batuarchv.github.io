@@ -1,0 +1,334 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<!-- Holds a read-only GoatCounter key: it may only talk to GoatCounter and load this site's own files.
+     (localhost entries are for a local test API; ?api= is only honoured on localhost.) -->
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: https://i.ytimg.com; connect-src https://batuarchv.goatcounter.com http://localhost:* http://127.0.0.1:*; object-src 'none'; base-uri 'self'; form-action 'none'">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Site Insights · batuarchv</title>
+<link rel="icon" type="image/png" sizes="32x32" href="../assets/img/favicon-32.png">
+<link rel="icon" type="image/png" sizes="64x64" href="../assets/img/favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@500;700;800&display=swap" rel="stylesheet">
+<script>try { var t = localStorage.getItem('theme'); if (t ? t === 'dark' : matchMedia('(prefers-color-scheme: dark)').matches) document.documentElement.classList.add('dark'); } catch (e) {}</script>
+<style>
+:root{
+  --bg:#f3f4f6; --bg-top:#f8f9fa; --bg-bot:#e8ebee; --stripe:#e8eaed; --bg-glow:rgba(255,255,255,.95);
+  --ink:#5b6066; --ink-strong:#33373c; --muted:#80878e; --navy:#17176b; --accent:#1a9ad4; --bar:#1a9ad4; --bar-hi:#34bdef;
+  --card:linear-gradient(180deg,#fff,#f6f8fa); --edge:rgba(20,30,50,.09); --hi:#fff; --track:#e9edf1;
+  --glass-a:rgba(255,255,255,.78); --glass-b:rgba(255,255,255,.55);
+  --plastic:linear-gradient(180deg,#fff 0%,#f3f5f7 46%,#e2e6ea 54%,#f3f5f7 100%); --pedge:#c3c8cd; --ledge:#b6bcc2;
+  --drop:0 8px 18px rgba(30,42,60,.1),0 1px 2px rgba(30,42,60,.08); --emboss:0 1px 0 #fff;
+  color-scheme:light;
+}
+html.dark{
+  --bg:#17191c; --bg-top:#1e2125; --bg-bot:#111316; --stripe:#1c1f23; --bg-glow:rgba(90,110,130,.22);
+  --ink:#b9c0c7; --ink-strong:#eef1f4; --muted:#98a1aa; --navy:#eef1f4; --accent:#5fd0f7; --bar:#34bdef; --bar-hi:#7fdcff;
+  --card:linear-gradient(180deg,#2e3237,#22252a); --edge:rgba(0,0,0,.55); --hi:rgba(255,255,255,.12); --track:#2a2e33;
+  --glass-a:rgba(52,57,63,.82); --glass-b:rgba(30,33,37,.7);
+  --plastic:linear-gradient(180deg,#3c4147 0%,#2e3237 46%,#22252a 54%,#2e3237 100%); --pedge:#0b0c0e; --ledge:#0e1012;
+  --drop:0 8px 18px rgba(0,0,0,.35),0 1px 2px rgba(0,0,0,.3); --emboss:0 1px 0 rgba(0,0,0,.5);
+  color-scheme:dark;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{min-height:100%;background:radial-gradient(120% 55% at 50% -12%,var(--bg-glow),transparent 62%),repeating-linear-gradient(180deg,transparent 0 3px,var(--stripe) 3px 4px),linear-gradient(180deg,var(--bg-top),var(--bg) 42%,var(--bg-bot))}
+body{font:500 14px/1.45 "M PLUS Rounded 1c",system-ui,sans-serif;color:var(--ink);-webkit-font-smoothing:antialiased;min-height:100vh}
+button,input{font:inherit;color:inherit}
+a{color:inherit}
+
+/* top bar: glass with the Wii seam */
+.top{position:sticky;top:0;z-index:5;display:flex;align-items:center;gap:14px;padding:12px clamp(14px,3vw,28px) 14px;
+  background:linear-gradient(180deg,var(--glass-a),var(--glass-b));-webkit-backdrop-filter:blur(16px) saturate(170%);backdrop-filter:blur(16px) saturate(170%)}
+.top::after{content:"";position:absolute;left:0;right:0;bottom:-9px;height:9px;pointer-events:none;
+  background:linear-gradient(180deg,#c2c7cc 0 2px,rgba(255,255,255,.9) 2px 3.5px,transparent 3.5px 6.5px,#34bdef 6.5px 8.5px,transparent 8.5px)}
+html.dark .top::after{background:linear-gradient(180deg,#0b0c0e 0 2px,rgba(255,255,255,.12) 2px 3.5px,transparent 3.5px 6.5px,#34bdef 6.5px 8.5px,transparent 8.5px)}
+.brand{display:flex;align-items:center;gap:10px;min-width:0}
+.brand img{width:34px;height:34px;flex:none}
+.brand b{display:block;font-size:16px;font-weight:800;color:var(--ink-strong);line-height:1.1}
+.brand small{display:block;font-size:12px;color:var(--muted);font-weight:700}
+.sp{flex:1}
+.seg{display:flex;padding:3px;border-radius:99px;background:var(--track);box-shadow:inset 0 1px 3px rgba(0,0,0,.12)}
+.seg button{border:0;background:none;padding:6px 13px;border-radius:99px;font-weight:800;font-size:13px;color:var(--muted);cursor:pointer;white-space:nowrap}
+.seg button.on{background:var(--plastic);color:var(--accent);box-shadow:0 0 0 1px var(--pedge),inset 0 1px 0 var(--hi),0 2px 4px rgba(0,0,0,.12)}
+.btn{border:0;cursor:pointer;padding:8px 15px;border-radius:99px;font-weight:800;font-size:13px;color:var(--ink-strong);background:var(--plastic);text-decoration:none;white-space:nowrap;
+  text-shadow:var(--emboss);box-shadow:0 0 0 1.5px var(--pedge),inset 0 2px 0 var(--hi),0 3px 0 var(--ledge),0 5px 10px rgba(0,0,0,.12);transition:transform .15s,box-shadow .2s,color .2s}
+.btn:hover,.btn:focus-visible{outline:0;color:var(--accent);box-shadow:0 0 0 1.5px #2fb6ea,0 0 0 5px rgba(52,189,239,.2),inset 0 2px 0 var(--hi),0 3px 0 #74cdee}
+.btn:active{transform:translateY(2px)}
+.btn.primary{color:#fff;text-shadow:0 1px 1px rgba(0,60,100,.4);background:linear-gradient(180deg,#7fdcff,#34bdef 50%,#1a9ad4);box-shadow:0 0 0 1.5px #168fc9,inset 0 2px 0 rgba(255,255,255,.6),0 3px 0 #0f6f9e,0 6px 12px rgba(26,154,212,.3)}
+
+main{max-width:1120px;margin:0 auto;padding:30px clamp(14px,3vw,28px) 60px}
+.grid{display:grid;gap:16px}
+.kpis{grid-template-columns:repeat(4,1fr)}
+.two{grid-template-columns:1.25fr 1fr}
+.three{grid-template-columns:repeat(3,1fr)}
+@media (max-width:860px){.kpis{grid-template-columns:repeat(2,1fr)}.two,.three{grid-template-columns:1fr}.seg button{padding:6px 9px}}
+@media (max-width:560px){.top{flex-wrap:wrap}.seg{order:3;width:100%;justify-content:space-between}.brand small{display:none}}
+.mt{margin-top:16px}
+
+.card{position:relative;border-radius:18px;padding:16px 18px 18px;background:var(--card);box-shadow:0 0 0 1px var(--edge),inset 0 1px 0 var(--hi),var(--drop)}
+.card h2{font-size:12px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);margin-bottom:12px}
+.kpi .v{font-size:clamp(28px,4vw,38px);font-weight:800;color:var(--navy);line-height:1.05;text-shadow:var(--emboss);font-variant-numeric:tabular-nums}
+.kpi .l{font-size:12px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
+.kpi .s{font-size:12.5px;font-weight:700;color:var(--muted);margin-top:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+/* visits per day: single series, one hue, rounded data-ends on the baseline */
+.chart{position:relative;height:220px}
+.chart svg{width:100%;height:100%;display:block;overflow:visible}
+.chart .grid-l{stroke:var(--edge);stroke-width:1}
+.chart .axis{fill:var(--muted);font-size:11px;font-weight:700}
+.chart .bar{fill:var(--bar);transition:fill .12s}
+.chart .hit{fill:transparent;cursor:default}
+.chart .hit:hover+.bar,.chart .bar.on{fill:var(--bar-hi)}
+.tip{position:absolute;pointer-events:none;z-index:3;padding:6px 10px;border-radius:10px;font-size:12px;font-weight:800;color:var(--ink-strong);white-space:nowrap;
+  background:var(--card);box-shadow:0 0 0 1px var(--edge),0 6px 16px rgba(0,0,0,.18);transform:translate(-50%,calc(-100% - 10px));opacity:0;transition:opacity .1s}
+.tip.on{opacity:1}
+.tip span{display:block;color:var(--muted);font-weight:700}
+
+/* ranked lists: magnitude bars in one hue, value in text ink */
+.rank{list-style:none;display:grid;gap:9px}
+.rank li{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:10px}
+.rank .th{width:40px;height:25px;border-radius:6px;object-fit:cover;box-shadow:0 0 0 1.5px var(--hi),0 0 0 2.5px var(--edge);background:var(--track)}
+.rank .ic{width:24px;text-align:center;font-size:16px}
+.rank .nm{min-width:0}
+.rank .nm b{display:block;font-size:13px;font-weight:800;color:var(--ink-strong);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rank .tr{height:6px;border-radius:99px;background:var(--track);margin-top:4px;overflow:hidden}
+.rank .tr i{display:block;height:100%;border-radius:99px;background:var(--bar)}
+.rank .n{font-weight:800;color:var(--ink-strong);font-variant-numeric:tabular-nums;font-size:13px}
+.empty{color:var(--muted);font-weight:700;font-size:13px;padding:6px 0}
+
+.foot{display:flex;flex-wrap:wrap;justify-content:space-between;gap:10px;align-items:center;margin-top:22px;color:var(--muted);font-weight:700;font-size:12.5px}
+.err{margin-top:16px;padding:12px 14px;border-radius:14px;font-weight:800;color:#c2413b;background:rgba(226,85,79,.1);box-shadow:inset 0 0 0 1px rgba(226,85,79,.3)}
+.loading{opacity:.55;transition:opacity .2s}
+
+/* connect card */
+.connect{max-width:560px;margin:40px auto 0}
+.connect h1{font-size:24px;font-weight:800;color:var(--navy);text-shadow:var(--emboss)}
+.connect p{margin-top:8px}
+.connect ol{margin:16px 0 0 20px;display:grid;gap:7px}
+.connect code{font-size:12.5px;padding:1px 6px;border-radius:6px;background:var(--track)}
+.connect label{display:block;margin-top:18px;font-size:12px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.connect input[type=password]{display:block;width:100%;margin-top:6px;padding:11px 14px;border-radius:12px;border:0;background:var(--track);box-shadow:inset 0 1px 3px rgba(0,0,0,.15);font-weight:700}
+.connect .row{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:16px;flex-wrap:wrap}
+.connect .chk{display:flex;align-items:center;gap:8px;font-weight:700;font-size:13px;margin:0;text-transform:none;letter-spacing:0;color:var(--ink)}
+.hidden{display:none!important}
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="brand"><img src="../assets/img/favicon.png" alt=""><div><b>Site Insights</b><small>batuarchv.github.io</small></div></div>
+  <div class="sp"></div>
+  <div class="seg" id="range" role="tablist" aria-label="Date range">
+    <button data-d="1">Today</button><button data-d="7" class="on">7 days</button><button data-d="30">30 days</button><button data-d="90">90 days</button>
+  </div>
+  <a class="btn" href="https://batuarchv.goatcounter.com" target="_blank" rel="noopener">Dashboard ↗</a>
+</header>
+
+<main>
+  <!-- one-time setup -->
+  <section class="card connect hidden" id="connect">
+    <h1>Connect GoatCounter</h1>
+    <p>This page reads your visitor numbers with a <b>read-only</b> GoatCounter key. You add it once; it stays in this browser only.</p>
+    <ol>
+      <li>Open <a href="https://batuarchv.goatcounter.com/user/api" target="_blank" rel="noopener"><b>batuarchv.goatcounter.com → API</b> ↗</a> (log in if asked).</li>
+      <li>Click <b>New API key</b>, give it a name (e.g. <code>insights page</code>) and tick only <b>Read statistics</b>.</li>
+      <li>Click <b>Create</b>, copy the key and paste it below.</li>
+    </ol>
+    <label for="key">API key</label>
+    <input id="key" type="password" autocomplete="off" spellcheck="false" placeholder="paste the key here">
+    <div class="row">
+      <label class="chk"><input type="checkbox" id="remember" checked> Remember on this computer</label>
+      <button class="btn primary" id="connectBtn">Connect</button>
+    </div>
+    <div class="err hidden" id="connectErr"></div>
+  </section>
+
+  <!-- stats -->
+  <section id="stats" class="hidden">
+    <div class="grid kpis">
+      <div class="card kpi"><div class="l">Visits</div><div class="v" id="kVisits">–</div><div class="s" id="kVisitsS">&nbsp;</div></div>
+      <div class="card kpi"><div class="l">Channel opens</div><div class="v" id="kEvents">–</div><div class="s" id="kEventsS">&nbsp;</div></div>
+      <div class="card kpi"><div class="l">Busiest day</div><div class="v" id="kPeak">–</div><div class="s" id="kPeakS">&nbsp;</div></div>
+      <div class="card kpi"><div class="l">Top source</div><div class="v" id="kRef" style="font-size:clamp(20px,2.6vw,26px)">–</div><div class="s" id="kRefS">&nbsp;</div></div>
+    </div>
+
+    <div class="card mt"><h2 id="chartTitle">Visits per day</h2><div class="chart" id="chart"><div class="tip" id="tip"></div></div></div>
+
+    <div class="grid two mt">
+      <div class="card"><h2>Channels people open</h2><ul class="rank" id="lChannels"></ul></div>
+      <div class="card"><h2>Where visitors come from</h2><ul class="rank" id="lRefs"></ul></div>
+    </div>
+    <div class="grid three mt">
+      <div class="card"><h2>Countries</h2><ul class="rank" id="lCountries"></ul></div>
+      <div class="card"><h2>Devices</h2><ul class="rank" id="lSizes"></ul></div>
+      <div class="card"><h2>Browsers</h2><ul class="rank" id="lBrowsers"></ul></div>
+    </div>
+    <div class="err hidden" id="statsErr"></div>
+    <div class="foot"><span id="updated">&nbsp;</span><span><button class="btn" id="refresh">Refresh</button> <button class="btn" id="disconnect">Forget key</button></span></div>
+  </section>
+</main>
+
+<script src="../assets/data.js"></script>
+<script>
+(() => {
+const SITE = 'https://batuarchv.goatcounter.com';
+// a local fake API can be used for testing, only when the page itself runs on localhost
+const API = (() => {
+  const q = new URLSearchParams(location.search).get('api');
+  return /^(localhost|127\.0\.0\.1)$/.test(location.hostname) && q && /^http:\/\/(localhost|127\.0\.0\.1):\d+$/.test(q) ? q : SITE;
+})();
+const $ = id => document.getElementById(id);
+const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const fmt = n => Number(n || 0).toLocaleString('en-US');
+const keyStore = {
+  get() { try { return sessionStorage.getItem('gc-key') || localStorage.getItem('gc-key') || ''; } catch (_) { return ''; } },
+  set(k, remember) { try { sessionStorage.setItem('gc-key', k); remember ? localStorage.setItem('gc-key', k) : localStorage.removeItem('gc-key'); } catch (_) {} },
+  clear() { try { sessionStorage.removeItem('gc-key'); localStorage.removeItem('gc-key'); } catch (_) {} },
+};
+
+/* channel names + tile thumbnails from the site's own content */
+const CH = {};
+try { (window.PORTFOLIO.pages || []).flatMap(p => p.channels || []).forEach(c => { CH[c.id] = c; }); } catch (_) {}
+const thumb = c => {
+  if (c && c.youtube && !(c.tile && c.tile.images && c.tile.images.length)) return `https://i.ytimg.com/vi/${encodeURIComponent(c.youtube)}/mqdefault.jpg`;
+  const n = c && ((c.tile && c.tile.images && c.tile.images[0]) || (c.items && c.items[0] && c.items[0].image));
+  if (!n) return c && c.kind === 'about' ? '../assets/img/favicon.png' : '';
+  return /\.\w{3,4}$/.test(n) ? '../assets/img/' + n.replace(/\.(\w+)$/, '-s.$1') : `../assets/img/${n}-s.webp`;
+};
+
+async function api(path) {
+  const r = await fetch(API + '/api/v0' + path, { headers: { Authorization: 'Bearer ' + keyStore.get(), 'Content-Type': 'application/json' } });
+  if (!r.ok) { const e = new Error('HTTP ' + r.status); e.status = r.status; throw e; }
+  return r.json();
+}
+const wait = ms => new Promise(r => setTimeout(r, ms));
+function errText(e) {
+  if (e.status === 401 || e.status === 403) return 'GoatCounter didn’t accept the key. Make sure it has “Read statistics” and was copied completely.';
+  if (e.status === 429) return 'GoatCounter is rate-limiting requests — wait a few seconds and press Refresh.';
+  if (!e.status) return 'Couldn’t reach GoatCounter. Check your connection and press Refresh.';
+  return 'GoatCounter answered with an error (' + e.status + '). Try Refresh in a moment.';
+}
+
+/* date range */
+let days = 7;
+try { days = +localStorage.getItem('gc-range') || 7; } catch (_) {}
+const iso = d => d.toISOString().slice(0, 10);
+const rangeParams = () => {
+  const end = new Date(), start = new Date(); start.setDate(end.getDate() - (days - 1));
+  return { start: iso(start), end: iso(end) };
+};
+document.querySelectorAll('#range button').forEach(b => {
+  b.classList.toggle('on', +b.dataset.d === days);
+  b.onclick = () => { days = +b.dataset.d; try { localStorage.setItem('gc-range', days); } catch (_) {}
+    document.querySelectorAll('#range button').forEach(x => x.classList.toggle('on', x === b)); load(); };
+});
+
+/* views */
+function show(which) { $('connect').classList.toggle('hidden', which !== 'connect'); $('stats').classList.toggle('hidden', which !== 'stats'); $('range').classList.toggle('hidden', which !== 'stats'); }
+function rankList(el, rows, opts = {}) {
+  if (!rows.length) { el.innerHTML = `<li class="empty">${opts.empty || 'No data in this range yet.'}</li>`; return; }
+  const max = Math.max(...rows.map(r => r.count), 1);
+  el.innerHTML = rows.slice(0, opts.limit || 8).map(r => `<li>
+    ${r.img !== undefined ? (r.img ? `<img class="th" src="${esc(r.img)}" alt="">` : '<span class="th"></span>') : `<span class="ic">${r.icon || '•'}</span>`}
+    <div class="nm"><b title="${esc(r.name)}">${esc(r.name)}</b><div class="tr"><i style="width:${Math.max(2, r.count / max * 100)}%"></i></div></div>
+    <span class="n">${fmt(r.count)}</span></li>`).join('');
+}
+const flag = id => /^[A-Z]{2}$/.test(id || '') ? String.fromCodePoint(...[...id].map(c => 127397 + c.charCodeAt(0))) : '🌐';
+const sizeIcon = n => /phone/i.test(n) ? '📱' : /tablet/i.test(n) ? '📲' : /monitor|computer|laptop/i.test(n) ? '🖥️' : '•';
+const refName = n => !n || n === '(unknown)' ? 'Direct / unknown' : n;
+
+function drawChart(stats) {
+  const el = $('chart'), tip = $('tip');
+  el.querySelector('svg') && el.querySelector('svg').remove();
+  // Today: hourly bars; otherwise one bar per day
+  const hourly = days === 1;
+  const pts = hourly ? ((stats[stats.length - 1] || {}).hourly || []).map((v, h) => ({ v, label: `${String(h).padStart(2, '0')}:00`, sub: 'today' }))
+                     : stats.map(s => ({ v: s.daily || 0, label: new Date(s.day + 'T12:00:00').toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' }), short: new Date(s.day + 'T12:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) }));
+  $('chartTitle').textContent = hourly ? 'Visits per hour today' : 'Visits per day';
+  const W = el.clientWidth || 800, H = 220, padL = 34, padB = 26, padT = 8, n = Math.max(pts.length, 1);
+  const max = Math.max(...pts.map(p => p.v), 1), nice = max <= 4 ? 4 : Math.ceil(max / 4) * 4;
+  const step = (W - padL) / n, bw = Math.max(3, Math.min(28, step - Math.max(2, step * .28)));
+  const y = v => H - padB - (v / nice) * (H - padB - padT);
+  let g = '';
+  for (let i = 0; i <= 4; i++) { const v = nice / 4 * i, yy = y(v); g += `<line class="grid-l" x1="${padL}" x2="${W}" y1="${yy}" y2="${yy}"/><text class="axis" x="${padL - 8}" y="${yy + 4}" text-anchor="end">${fmt(v)}</text>`; }
+  const every = Math.ceil(n / (W < 600 ? 5 : 10));
+  pts.forEach((p, i) => {
+    const x = padL + i * step + (step - bw) / 2, h = Math.max(0, H - padB - y(p.v)), r = Math.min(4, bw / 2, h);
+    // rounded top only (data end), flat on the baseline
+    const top = H - padB - h;
+    const path = h ? `M${x},${H - padB}V${top + r}Q${x},${top} ${x + r},${top}H${x + bw - r}Q${x + bw},${top} ${x + bw},${top + r}V${H - padB}Z` : '';
+    g += `<rect class="hit" data-i="${i}" x="${padL + i * step}" y="${padT}" width="${step}" height="${H - padB - padT}"/>${path ? `<path class="bar" d="${path}"/>` : '<path class="bar"/>'}`;
+    if (i % every === 0) g += `<text class="axis" x="${x + bw / 2}" y="${H - 7}" text-anchor="middle">${esc(hourly ? p.label.slice(0, 2) : p.short)}</text>`;
+  });
+  el.insertAdjacentHTML('afterbegin', `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${hourly ? 'Visits per hour today' : 'Visits per day'}">${g}</svg>`);
+  el.querySelectorAll('.hit').forEach(h => {
+    h.onmouseenter = () => { const p = pts[+h.dataset.i]; const bx = +h.getAttribute('x') + step / 2;
+      tip.innerHTML = `${fmt(p.v)} visit${p.v === 1 ? '' : 's'}<span>${esc(p.label)}</span>`; tip.style.left = (bx / W * 100) + '%'; tip.style.top = y(p.v) + 'px'; tip.classList.add('on'); };
+    h.onmouseleave = () => tip.classList.remove('on');
+  });
+}
+
+/* load everything for the range (sequential: GoatCounter allows ~4 requests/second) */
+let lastStats = [];
+async function load() {
+  $('statsErr').classList.add('hidden'); $('stats').classList.add('loading');
+  const { start, end } = rangeParams(), q = `start=${start}&end=${end}`;
+  try {
+    const total = await api(`/stats/total?${q}`);
+    const hits = await api(`/stats/hits?${q}&limit=100`); await wait(250);
+    const refs = await api(`/stats/toprefs?${q}&limit=10`);
+    const locs = await api(`/stats/locations?${q}&limit=10`); await wait(250);
+    const sizes = await api(`/stats/sizes?${q}&limit=10`);
+    const brs = await api(`/stats/browsers?${q}&limit=10`);
+
+    lastStats = total.stats || [];
+    const visits = total.total ?? lastStats.reduce((a, s) => a + (s.daily || 0), 0);
+    const evRows = (hits.hits || []).filter(h => h.event && /^\/?channel\//.test(h.path || ''));
+    const events = total.total_events ?? evRows.reduce((a, h) => a + (h.count || 0), 0);
+    $('kVisits').textContent = fmt(visits);
+    $('kVisitsS').textContent = days === 1 ? 'today' : `last ${days} days`;
+    $('kEvents').textContent = fmt(events);
+    $('kEventsS').textContent = visits ? `${(events / visits).toFixed(1)} per visit` : ' ';
+    const peak = lastStats.reduce((a, s) => (s.daily || 0) > (a.daily || 0) ? s : a, {});
+    $('kPeak').textContent = peak.daily ? fmt(peak.daily) : '–';
+    $('kPeakS').textContent = peak.daily ? new Date(peak.day + 'T12:00:00').toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' }) : 'no visits yet';
+    const top = (refs.stats || [])[0];
+    $('kRef').textContent = top ? refName(top.name) : '–';
+    $('kRefS').textContent = top ? `${fmt(top.count)} visit${top.count === 1 ? '' : 's'}` : 'no visits yet';
+
+    drawChart(lastStats);
+    rankList($('lChannels'), evRows.map(h => { const id = (h.path || '').replace(/^\/?channel\//, ''), c = CH[id];
+      return { name: (c && (c.tag || c.name)) || h.title || id, count: h.count || 0, img: thumb(c) }; }).sort((a, b) => b.count - a.count),
+      { empty: 'No channel opened in this range yet.' });
+    rankList($('lRefs'), (refs.stats || []).map(r => ({ name: refName(r.name), count: r.count || 0, icon: /instagram/i.test(r.name || '') ? '📸' : !r.name || r.name === '(unknown)' ? '🔗' : '🌐' })));
+    rankList($('lCountries'), (locs.stats || []).map(r => ({ name: r.name || r.id || 'Unknown', count: r.count || 0, icon: flag(r.id) })));
+    rankList($('lSizes'), (sizes.stats || []).map(r => ({ name: r.name || 'Unknown', count: r.count || 0, icon: sizeIcon(r.name) })));
+    rankList($('lBrowsers'), (brs.stats || []).map(r => ({ name: r.name || 'Unknown', count: r.count || 0, icon: '🧭' })));
+    $('updated').textContent = 'Updated ' + new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+  } catch (e) {
+    if (e.status === 401 || e.status === 403) { keyStore.clear(); show('connect'); $('connectErr').textContent = errText(e); $('connectErr').classList.remove('hidden'); }
+    else { $('statsErr').textContent = errText(e); $('statsErr').classList.remove('hidden'); }
+  } finally { $('stats').classList.remove('loading'); }
+}
+
+/* connect / forget */
+$('connectBtn').onclick = async () => {
+  const k = $('key').value.replace(/\s+/g, ''); const err = $('connectErr');
+  if (!k) { err.textContent = 'Paste the API key first.'; err.classList.remove('hidden'); return; }
+  keyStore.set(k, $('remember').checked); $('connectBtn').disabled = true; err.classList.add('hidden');
+  try { await api('/stats/total?start=' + iso(new Date()) + '&end=' + iso(new Date())); $('key').value = ''; show('stats'); load(); }
+  catch (e) { keyStore.clear(); err.textContent = errText(e); err.classList.remove('hidden'); }
+  finally { $('connectBtn').disabled = false; }
+};
+$('key').addEventListener('keydown', e => { if (e.key === 'Enter') $('connectBtn').click(); });
+$('refresh').onclick = load;
+$('disconnect').onclick = () => { keyStore.clear(); show('connect'); };
+let rt; addEventListener('resize', () => { clearTimeout(rt); rt = setTimeout(() => lastStats.length && drawChart(lastStats), 150); });
+
+if (keyStore.get()) { show('stats'); load(); } else show('connect');
+})();
+</script>
+</body>
+</html>

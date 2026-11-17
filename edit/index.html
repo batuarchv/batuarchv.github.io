@@ -240,6 +240,7 @@ code{background:#f1f3f5;border-radius:6px;padding:1px 6px;font-size:12px}
   <div class="actions">
     <button class="btn icon" id="undo" title="Geri al (⌘Z)" aria-label="Geri al">↶</button>
     <button class="btn icon" id="redo" title="Yinele (⇧⌘Z)" aria-label="Yinele">↷</button>
+    <a class="btn c-link" href="../stats/" target="_blank" rel="noopener" style="text-decoration:none">İstatistikler ↗</a>
     <button class="btn c-link" id="openLive">Siteyi aç ↗</button>
     <button class="btn" id="settingsBtn">Ayarlar</button>
     <button class="btn primary" id="publishBtn">Yayınla</button>
@@ -276,7 +277,7 @@ const API = (() => {
 })();
 const ASSET = '../assets/';
 const MAX_VIDEO_MB = 25, MAX_PER_PAGE = 12;   // GitHub drops very large single uploads, so videos stay small
-const EDITOR_VERSION = 9;   // bump together with edit/version.json when the editor changes
+const EDITOR_VERSION = 10;   // bump together with edit/version.json when the editor changes
 
 /* ════════════════════════════ tiny helpers ════════════════════════════ */
 const $ = id => document.getElementById(id);
