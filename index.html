@@ -679,6 +679,8 @@ let D = ED ? ED.data() : window.PORTFOLIO;
 
 const $ = id => document.getElementById(id);
 const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+// links from content only open web pages or mail: anything else (javascript:, data:, …) becomes inert
+const safeUrl = u => { u = String(u ?? '').trim(); return /^(https?:\/\/|mailto:)/i.test(u) ? u : '#'; };
 const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
 function imgPath(n, small) {
   if (!n) return '';
@@ -829,7 +831,7 @@ function contactList() {
   return `<div class="list">
     ${p.workEmail ? `<a class="c-link" href="mailto:${esc(p.workEmail)}">${esc(p.workEmail)}<span>work</span></a>` : ''}
     ${p.email ? `<a class="c-link" href="mailto:${esc(p.email)}">${esc(p.email)}<span>personal</span></a>` : ''}
-    ${(p.links || []).map(l => `<a class="c-link" href="${esc(l.url)}" target="_blank" rel="noopener">${esc(l.label)}<span>↗</span></a>`).join('')}</div>`;
+    ${(p.links || []).map(l => `<a class="c-link" href="${esc(safeUrl(l.url))}" target="_blank" rel="noopener">${esc(l.label)}<span>↗</span></a>`).join('')}</div>`;
 }
 function insideHTML(c) {
   const p = P();
@@ -917,8 +919,8 @@ function closeCh(instant) {
 back.addEventListener('click', () => stage === 'inside' && !direct ? crossfade(() => setStage('banner')) : closeCh());
 start.addEventListener('click', () => {
   if (stage === 'banner') return crossfade(() => setStage('inside'));
-  const u = cur.button && cur.button.url; if (!u) return;
-  u.startsWith('mailto') ? (location.href = u) : window.open(u, '_blank', 'noopener');
+  const u = safeUrl(cur.button && cur.button.url); if (u === '#') return;
+  /^mailto:/i.test(u) ? (location.href = u) : window.open(u, '_blank', 'noopener');
 });
 banner.addEventListener('click', () => stage === 'banner' && crossfade(() => setStage('inside')));
 
