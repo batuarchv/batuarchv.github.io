@@ -272,7 +272,7 @@ const API = (() => {
 })();
 const ASSET = '../assets/';
 const MAX_VIDEO_MB = 25, MAX_PER_PAGE = 12;   // GitHub drops very large single uploads, so videos stay small
-const EDITOR_VERSION = 8;   // bump together with edit/version.json when the editor changes
+const EDITOR_VERSION = 9;   // bump together with edit/version.json when the editor changes
 
 /* ════════════════════════════ tiny helpers ════════════════════════════ */
 const $ = id => document.getElementById(id);
@@ -1112,11 +1112,12 @@ async function publishOnce() {
           lastErr = e;
           // GitHub now and then answers one request in a burst with 401 although the key is fine:
           // ask again with the same key; only a key that really stopped working ends the publish
-          if (e.status === 401) { try { await gh(repoPath('')); continue; } catch (_) { break; } }
+          // (seen live: long uploads of big videos come back 401 every time while the key is fine)
+          if (e.status === 401) { try { await gh(repoPath('')); e.keyOk = true; continue; } catch (_) { break; } }
           if (!(e.status === 0 || e.status >= 500 || e.rate)) break;
         }
       }
-      if (!blob) { lastErr.file = name; lastErr.size = f.blob.size; throw lastErr; }
+      if (!blob) { lastErr.file = name; lastErr.size = f.blob.size; if (lastErr.keyOk) lastErr.tooBig = true; throw lastErr; }
       tree.push({ path: f.path, mode: '100644', type: 'blob', sha: blob.sha }); tickBar();
     }
     step('İçerik kaydediliyor');
@@ -1142,13 +1143,14 @@ async function publishOnce() {
   } catch (err) {
     console.error(err);
     let msg = ghError(err);
-    if (err.file) {
+    if (err.tooBig) msg = `GitHub “${err.file}” (${(err.size / 1048576).toFixed(1)} MB) dosyasını kabul etmedi — anahtarın sağlam, sorun dosyanın büyüklüğü. Videoyu küçültüp (ör. HandBrake ile 720p, ~10 MB) yeniden ekle ya da YouTube linki kullan. Taslağın duruyor.`;
+    else if (err.file) {
       msg = `“${err.file}” (${(err.size / 1048576).toFixed(1)} MB) GitHub’a gönderilemedi. ` + msg;
       if (err.size > 12 * 1048576) msg += ` Bu dosya tek seferde göndermek için çok büyük: videoyu küçültüp (ör. HandBrake ile 720p, ~10 MB) yeniden ekle ya da YouTube linki kullan. Taslağın duruyor.`;
     }
     if ($('perr')) $('perr').textContent = msg;
-    const relink = err.status === 401 || err.status === 403 || err.status === 404;
-    if (err.status === 401) tokenStore.clear();   // a rejected key is useless; anything else keeps it
+    const relink = !err.tooBig && (err.status === 401 || err.status === 403 || err.status === 404);
+    if (err.status === 401 && !err.tooBig) tokenStore.clear();   // a rejected key is useless; anything else keeps it
     if ($('pfoot')) {
       $('pfoot').innerHTML = `<button class="btn" data-x="1">Kapat</button>${relink ? '<button class="btn primary" id="relink">Yeni anahtarla bağlan</button>' : '<button class="btn primary" id="retry">Tekrar dene</button>'}`;
       $('sheet').onclick = async e => {
