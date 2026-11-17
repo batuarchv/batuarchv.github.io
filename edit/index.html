@@ -272,7 +272,7 @@ const API = (() => {
 })();
 const ASSET = '../assets/';
 const MAX_VIDEO_MB = 25, MAX_PER_PAGE = 12;   // GitHub drops very large single uploads, so videos stay small
-const EDITOR_VERSION = 7;   // bump together with edit/version.json when the editor changes
+const EDITOR_VERSION = 8;   // bump together with edit/version.json when the editor changes
 
 /* ════════════════════════════ tiny helpers ════════════════════════════ */
 const $ = id => document.getElementById(id);
@@ -1087,9 +1087,21 @@ async function publishOnce() {
     if (files.length) step(`${files.length} dosya yükleniyor`);
     // small files first; every upload retries a few times on connection drops / GitHub hiccups
     files.sort((a, b) => a.blob.size - b.blob.size);
+    // files that are already on GitHub with the same bytes (e.g. a big video pushed by hand) are not sent again
+    let onRepo = {};
+    try { (await gh(repoPath(`/git/trees/${commit.tree.sha}?recursive=1`))).tree.forEach(x => { onRepo[x.path] = x.sha; }); } catch (_) {}
+    const gitSha = async b => {   // git's blob id: sha1("blob <size>\0" + bytes)
+      const head = new TextEncoder().encode(`blob ${b.size}\0`), body = new Uint8Array(await b.arrayBuffer());
+      const all = new Uint8Array(head.length + body.length); all.set(head); all.set(body, head.length);
+      return [...new Uint8Array(await crypto.subtle.digest('SHA-1', all))].map(x => x.toString(16).padStart(2, '0')).join('');
+    };
     const mb = n => (n / 1048576).toFixed(n < 10485760 ? 1 : 0) + ' MB';
     for (const [i, f] of files.entries()) {
       const name = f.path.split('/').pop();
+      if (onRepo[f.path]) {
+        const sha = await gitSha(f.blob).catch(() => null);
+        if (sha && sha === onRepo[f.path]) { step(`Zaten GitHub’da: ${name} (${mb(f.blob.size)})`); tree.push({ path: f.path, mode: '100644', type: 'blob', sha }); tickBar(); continue; }
+      }
       step(`Yükleniyor ${i + 1}/${files.length}: ${name} (${mb(f.blob.size)})`);
       const body = JSON.stringify({ content: await blobToB64(f.blob), encoding: 'base64' });
       let blob = null, lastErr = null;
