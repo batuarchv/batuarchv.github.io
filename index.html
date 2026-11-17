@@ -24,6 +24,16 @@
 <link rel="icon" type="image/png" sizes="32x32" href="assets/img/favicon-32.png">
 <link rel="icon" type="image/png" sizes="64x64" href="assets/img/favicon.png">
 <link rel="apple-touch-icon" sizes="180x180" href="assets/img/apple-touch-icon.png">
+<script>/* GoatCounter: privacy-friendly visit counts, no cookies (dashboard: https://batuarchv.goatcounter.com).
+   Not loaded inside the editor's preview; count.js itself ignores localhost. */
+(function () {
+  var CODE = 'batuarchv';
+  if (/[?&]preview=/.test(location.search)) return;
+  var s = document.createElement('script');
+  s.async = true; s.src = 'https://gc.zgo.at/count.js';
+  s.setAttribute('data-goatcounter', 'https://' + CODE + '.goatcounter.com/count');
+  document.head.appendChild(s);
+})();</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;500;700;800&display=swap" rel="stylesheet">
@@ -888,6 +898,8 @@ function crossfade(fn) {
 const rectTransform = r => `translate(${r.left}px,${r.top}px) scale(${r.width / innerWidth},${r.height / innerHeight})`;
 function openCh(id, el, toStage) {
   const c = CH[id]; if (!c) return;
+  // which channels people open (shows under Events in GoatCounter); not from the editor's preview
+  if (!ED && !chOpen && window.goatcounter && window.goatcounter.count) window.goatcounter.count({ path: 'channel/' + id, title: c.name || id, event: true });
   const bs = (c.banner && c.banner.style) || (c.kind === 'about' ? 'disc' : c.kind === 'contact' ? 'mail' : 'cards');
   banner.className = 'banner' + (bs === 'disc' || bs === 'mail' ? ' light' : '');
   if (chOpen) { cur = c; banner.innerHTML = bannerHTML(c); spreadFan(); return setStage(toStage || 'banner'); }
